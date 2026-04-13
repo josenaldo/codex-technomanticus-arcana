@@ -1,0 +1,44 @@
+source: "Fundamentos/Algoritmos.md"
+source_hash: "abc123def456"
+deck: "Codex::Fundamentos"
+generated: "2026-04-12"
+tags:
+  - fundamentos
+  - entrevista
+
+cards:
+  - id: fund-algo-001
+    type: basic
+    front: "O que é complexidade de tempo (time complexity)?"
+    back: |
+      Medida de como o tempo de execução cresce
+      em função do tamanho da entrada (n).
+      Expressa em notação Big O.
+    tags: [algoritmos, complexidade]
+
+  - id: fund-algo-002
+    type: cloze
+    text: "A busca binária tem complexidade {{c1::O(log n)}} porque divide o espaço pela metade."
+    tags: [algoritmos, busca]
+
+  - id: fund-algo-003
+    type: vocab
+    term_pt: "Complexidade de tempo"
+    term_en: "Time complexity"
+    definition: "How the running time grows as a function of input size."
+    usage: "The time complexity of this solution is O(n log n)."
+    tags: [algoritmos, vocabulario]
+
+  - id: fund-algo-004
+    type: scenario
+    situation: "Você precisa buscar um elemento em uma lista ordenada de 1 milhão de itens."
+    question: "Qual algoritmo usar e qual a complexidade?"
+    answer: "Busca binária — O(log n). No máximo ~20 comparações."
+    tags: [algoritmos, busca]
+
+  - id: fund-algo-005
+    type: pitfall
+    trap: "Usar busca binária em lista não ordenada"
+    why: "Busca binária assume dados ordenados. Em lista desordenada, retorna resultado incorreto silenciosamente."
+    prevention: "Sempre validar ou garantir ordenação antes de aplicar."
+    tags: [algoritmos, armadilhas]
