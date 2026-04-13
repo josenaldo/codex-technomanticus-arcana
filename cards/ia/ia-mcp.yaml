@@ -1,0 +1,109 @@
+source: "IA/MCP.md"
+source_hash: "4495a420a054"
+deck: "Codex::IA"
+generated: "2026-04-13"
+tags:
+  - ia
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+  - id: ia-mcp-001
+    type: basic
+    front: "O que e MCP e qual analogia oficial descreve seu proposito?"
+    back: "Model Context Protocol e um protocolo aberto que padroniza comunicacao entre clientes de IA e servidores de contexto. Analogia oficial: 'MCP e para agents o que LSP foi para editores'."
+    tags: [ia, mcp, conceito]
+
+  - id: ia-mcp-002
+    type: basic
+    front: "Quais sao os tres papeis (roles) na arquitetura MCP?"
+    back: "Client (app com LLM, ex: Claude Desktop, Cursor), Server (expoe capabilities como filesystem, git, postgres) e Host (app que roda ambos, ex: Claude Desktop e client + host)."
+    tags: [ia, mcp, arquitetura]
+
+  - id: ia-mcp-003
+    type: basic
+    front: "Quais sao os tres primitivos que um MCP Server expoe?"
+    back: "Tools (funcoes ativas que o modelo chama), Resources (conteudo passivo para contexto) e Prompts (templates invocaveis pelo usuario). Cada um tem papel distinto no protocolo."
+    tags: [ia, mcp, primitivos]
+
+  - id: ia-mcp-004
+    type: basic
+    front: "Quais sao os dois transportes suportados pelo MCP e quando usar cada um?"
+    back: "stdio para servidores locais rodando como subprocesso (baixa latencia, simples). HTTP+SSE para servidores remotos com autenticacao (OAuth/bearer/mTLS), suportando multi-usuario."
+    tags: [ia, mcp, transporte]
+
+  - id: ia-mcp-005
+    type: basic
+    front: "Por que MCP se tornou padrao de facto em 2025?"
+    back: "Apos lancamento pela Anthropic em nov/2024, OpenAI, Google e Microsoft aderiram em 2025. Eliminou N implementacoes duplicadas: escreve-se um server MCP e qualquer client compativel usa."
+    tags: [ia, mcp, ecossistema]
+
+  # === CLOZE (3) ===
+  - id: ia-mcp-006
+    type: cloze
+    text: "MCP usa protocolo {{c1::JSON-RPC}} sobre transporte {{c2::stdio ou HTTP+SSE}}."
+    tags: [ia, mcp, protocolo]
+
+  - id: ia-mcp-007
+    type: cloze
+    text: "No MCP, {{c1::Tools}} sao funcoes ativas que o modelo chama, enquanto {{c2::Resources}} sao conteudo passivo para leitura."
+    tags: [ia, mcp, primitivos]
+
+  - id: ia-mcp-008
+    type: cloze
+    text: "A analogia oficial do MCP e: 'MCP e para {{c1::agents}} o que {{c2::LSP}} foi para editores'."
+    tags: [ia, mcp, conceito]
+
+  # === VOCAB (2) ===
+  - id: ia-mcp-009
+    type: vocab
+    term_pt: "Servidor MCP"
+    term_en: "MCP Server"
+    definition: "Componente que expoe capabilities (tools, resources, prompts) a clientes de IA via protocolo MCP padronizado."
+    usage: "We built an MCP server that exposes our PostgreSQL database as read-only tools for the AI agent."
+    tags: [ia, mcp, vocabulario]
+
+  - id: ia-mcp-010
+    type: vocab
+    term_pt: "Injecao de prompt via resultados de tool"
+    term_en: "Prompt injection via tool results"
+    definition: "Ataque onde dados retornados por um MCP server contem instrucoes maliciosas que manipulam o comportamento do LLM."
+    usage: "We sanitize all tool results to prevent prompt injection from untrusted MCP servers."
+    tags: [ia, mcp, seguranca, vocabulario]
+
+  # === SCENARIO (2) ===
+  - id: ia-mcp-011
+    type: scenario
+    situation: "Voce precisa dar acesso ao Claude Desktop para ler/escrever arquivos locais e consultar um Postgres remoto."
+    question: "Como voce arquiteta isso com MCP?"
+    answer: "Dois MCP servers: filesystem via stdio (local, subprocesso) e postgres via HTTP+SSE (remoto, com auth). Claude Desktop como host/client descobre tools de ambos automaticamente."
+    tags: [ia, mcp, arquitetura, cenario]
+
+  - id: ia-mcp-012
+    type: scenario
+    situation: "Sua equipe quer expor um CRM interno para multiplos clientes de IA (Claude, Cursor, Copilot)."
+    question: "MCP server dedicado ou tool direta em cada cliente?"
+    answer: "MCP server dedicado. Escreve uma vez, qualquer client compativel usa. Tool direta so faz sentido quando apenas um client consome a capability."
+    tags: [ia, mcp, decisao, cenario]
+
+  # === PITFALL (3) ===
+  - id: ia-mcp-013
+    type: pitfall
+    trap: "Rodar MCP server com acesso total ao filesystem sem restricoes."
+    why: "MCP server e superficie de ataque. O modelo pode ser manipulado via prompt injection para executar operacoes destrutivas no filesystem."
+    prevention: "Aplicar principio de menor privilegio: restringir diretorios, operacoes read-only quando possivel, e auditar tool calls."
+    tags: [ia, mcp, seguranca, armadilha]
+
+  - id: ia-mcp-014
+    type: pitfall
+    trap: "Usar community MCP servers sem auditoria de codigo."
+    why: "Supply chain risk: servers da comunidade podem conter codigo malicioso ou expor dados sensiveis sem consentimento."
+    prevention: "Auditar codigo-fonte, preferir servers oficiais, isolar em sandbox, monitorar tool calls via logs centralizados."
+    tags: [ia, mcp, seguranca, armadilha]
+
+  - id: ia-mcp-015
+    type: pitfall
+    trap: "Confundir Tools com Resources ao desenhar um MCP server."
+    why: "Tools sao acoes ativas (modelo decide chamar), Resources sao conteudo passivo (injetado no contexto). Misturar causa UX confusa e permissoes erradas."
+    prevention: "Regra: se o modelo executa algo, e Tool. Se apenas le dados para contexto, e Resource."
+    tags: [ia, mcp, design, armadilha]

@@ -1,0 +1,139 @@
+source: "IA/Agents.md"
+source_hash: "11ec312d3de2"
+deck: "Codex::IA"
+generated: "2026-04-13"
+tags:
+  - ia
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: ia-agents-001
+    type: basic
+    front: "What defines an AI agent versus a simple LLM call?"
+    back: "An agent = LLM + tools + execution loop with autonomy. It receives an objective, decides which tool to use, executes it, observes the result, and decides whether to continue or stop. A simple LLM call is one-shot with no tool use."
+    tags:
+      - agents
+      - definicao
+
+  - id: ia-agents-002
+    type: basic
+    front: "What is the ReAct pattern in AI agents?"
+    back: "Reason + Act: the agent alternates between reasoning (thinking about what to do) and acting (calling a tool). In 2026, this is native via tool use APIs — the model reasons internally and emits tool calls without explicit chain-of-thought prompting."
+    tags:
+      - agents
+      - react
+
+  - id: ia-agents-003
+    type: basic
+    front: "What are the two types of memory in AI agents?"
+    back: "Short-term memory is the context window — conversation history within a session. Long-term memory persists across sessions via files, vector databases, or traditional DBs. Use compaction strategies for long conversations to avoid context rot."
+    tags:
+      - agents
+      - memoria
+
+  - id: ia-agents-004
+    type: basic
+    front: "What is the orchestrator + sub-agents pattern?"
+    back: "A main orchestrator agent delegates tasks to specialized sub-agents. Sub-agents can run in parallel, use different model tiers (cheap for simple tasks, powerful for complex), and return results to the orchestrator for synthesis."
+    tags:
+      - agents
+      - orquestracao
+
+  - id: ia-agents-005
+    type: basic
+    front: "What are the key metrics for evaluating AI agents?"
+    back: "Task completion rate, cost per task, error rate, and human intervention rate. A good agent completes tasks reliably at low cost with minimal errors and rare need for human help."
+    tags:
+      - agents
+      - avaliacao
+
+  # --- CLOZE (3) ---
+  - id: ia-agents-006
+    type: cloze
+    text: "The agent execution loop is: receive objective -> {{c1::LLM decides next action}} -> execute tool -> {{c2::observe result}} -> decide continue or stop."
+    tags:
+      - agents
+      - loop
+
+  - id: ia-agents-007
+    type: cloze
+    text: "Tool design principles for agents: clear names, {{c1::typed inputs}}, compact outputs, no overlap between tools, {{c2::idempotent}} operations, and informative error messages."
+    tags:
+      - agents
+      - ferramentas
+
+  - id: ia-agents-008
+    type: cloze
+    text: "Anthropic's guidance is: use {{c1::workflows}} when you can, {{c2::agents}} when you must. Deterministic pipelines are more predictable and cheaper than autonomous agents."
+    tags:
+      - agents
+      - principios
+
+  # --- VOCAB (2) ---
+  - id: ia-agents-009
+    type: vocab
+    term_pt: "compactacao de contexto"
+    term_en: "context compaction"
+    definition: "Technique to summarize older conversation turns so the agent's context window doesn't overflow during long-running tasks. Preserves key facts while freeing token budget."
+    usage: "Our coding agent uses context compaction every 50 turns, summarizing earlier work so it can continue without losing track of the objective."
+    tags:
+      - agents
+      - memoria
+
+  - id: ia-agents-010
+    type: vocab
+    term_pt: "humano no loop"
+    term_en: "human-in-the-loop"
+    definition: "Guardrail pattern where the agent pauses and requests human approval before executing destructive or irreversible actions like deleting data or deploying to production."
+    usage: "We configured human-in-the-loop for any agent action that modifies production databases or pushes code."
+    tags:
+      - agents
+      - guardrails
+
+  # --- SCENARIO (2) ---
+  - id: ia-agents-011
+    type: scenario
+    situation: "You're building a customer support agent that needs to look up orders, check shipping status, and process refunds. A colleague proposes one mega-tool that does everything."
+    question: "Why is this a bad idea and what's the better approach?"
+    answer: "One mega-tool violates tool design principles: no clear name per action, mixed concerns, hard for the LLM to choose correctly. Create separate focused tools (lookup_order, check_shipping, process_refund) with typed inputs and compact outputs."
+    tags:
+      - agents
+      - ferramentas
+
+  - id: ia-agents-012
+    type: scenario
+    situation: "Your autonomous coding agent occasionally runs rm -rf on important directories when trying to clean up build artifacts."
+    question: "What guardrails should you implement?"
+    answer: "Add max_steps limit, sandbox the agent's filesystem access, require human-in-the-loop for destructive commands (rm, drop, delete), use allowlists for permitted commands, and log all actions for audit."
+    tags:
+      - agents
+      - guardrails
+
+  # --- PITFALL (3) ---
+  - id: ia-agents-013
+    type: pitfall
+    trap: "Building an autonomous agent when a deterministic workflow would suffice."
+    why: "Agents are unpredictable, harder to debug, more expensive, and slower. If the steps are known in advance, a coded pipeline (workflow) is more reliable, testable, and cost-effective."
+    prevention: "Map out the task flow first. If steps are fixed and don't require dynamic decisions, build a workflow. Reserve agents for tasks that genuinely need adaptive decision-making."
+    tags:
+      - agents
+      - principios
+
+  - id: ia-agents-014
+    type: pitfall
+    trap: "Not setting max_steps or cost limits on agent execution loops."
+    why: "Without limits, an agent can loop indefinitely on a failed task, burning tokens and money. A stuck agent retrying the same tool call can cost hundreds of dollars before anyone notices."
+    prevention: "Always set max_steps, max_tokens, and cost budget limits. Implement circuit breakers that halt execution after N consecutive failures. Alert on cost anomalies."
+    tags:
+      - agents
+      - custos
+
+  - id: ia-agents-015
+    type: pitfall
+    trap: "Giving all sub-agents access to the most powerful (expensive) model."
+    why: "Most sub-tasks (formatting, simple lookups, classification) don't need frontier models. Using GPT-4 class for everything multiplies cost 10-50x versus using smaller models for simple tasks."
+    prevention: "Use model tiering: orchestrator gets a powerful model, sub-agents get the cheapest model that handles their specific task. Benchmark each sub-agent to find the minimum viable model."
+    tags:
+      - agents
+      - custos

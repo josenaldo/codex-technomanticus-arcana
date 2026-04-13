@@ -1,0 +1,109 @@
+source: "IA/Skills e Prompting.md"
+source_hash: "c99952ab5f13"
+deck: "Codex::IA"
+generated: "2026-04-13"
+tags:
+  - ia
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+  - id: ia-prompting-001
+    type: basic
+    front: "Qual a evolucao do campo: prompt engineering, context engineering e agent skills?"
+    back: "Prompt engineering (2023): otimizar instrucoes isoladas. Context engineering (2025): curar todo o contexto que o modelo recebe. Agent skills: empacotar comportamentos reutilizaveis que agentes carregam sob demanda."
+    tags: [ia, prompting, conceito]
+
+  - id: ia-prompting-002
+    type: basic
+    front: "Quando usar few-shot vs chain-of-thought prompting?"
+    back: "Few-shot quando o formato da saida importa (consistencia de estrutura via exemplos). Chain-of-thought quando o raciocinio importa (problemas multi-step, logica, matematica)."
+    tags: [ia, prompting, tecnicas]
+
+  - id: ia-prompting-003
+    type: basic
+    front: "Qual a estrutura recomendada para um system prompt eficaz?"
+    back: "Role/persona + context + rules + output format + examples. Usar listas (nao paragrafos), ser especifico (nao generico), regras criticas no inicio E no fim do prompt."
+    tags: [ia, prompting, systemprompt]
+
+  - id: ia-prompting-004
+    type: basic
+    front: "Por que usar delimitadores XML em prompts e qual o beneficio de seguranca?"
+    back: "XML tags separam instrucoes confiaveis de dados nao-confiaveis. Previne prompt injection pois o modelo distingue instrucoes do sistema de conteudo do usuario injetado."
+    tags: [ia, prompting, seguranca]
+
+  - id: ia-prompting-005
+    type: basic
+    front: "O que e a curva sinal/ruido de contexto e qual o sweet spot tipico?"
+    back: "Mais tokens no contexto nao significa melhor resposta. Ha um ponto otimo (tipicamente <16K tokens) onde sinal e maximo. Alem disso, ruido dilui a atencao do modelo."
+    tags: [ia, prompting, contexto]
+
+  # === CLOZE (3) ===
+  - id: ia-prompting-006
+    type: cloze
+    text: "Na tecnica {{c1::ReAct}}, o agente alterna entre raciocinio (Thought) e {{c2::acao}} (Action/Observation) para resolver tarefas."
+    tags: [ia, prompting, tecnicas]
+
+  - id: ia-prompting-007
+    type: cloze
+    text: "{{c1::Self-consistency}} executa N chamadas ao modelo e usa {{c2::votacao}} para selecionar a resposta mais frequente."
+    tags: [ia, prompting, tecnicas]
+
+  - id: ia-prompting-008
+    type: cloze
+    text: "Em context engineering, {{c1::compaction}} resume o contexto quando se aproxima do limite de tokens, preservando informacoes criticas."
+    tags: [ia, prompting, contexto]
+
+  # === VOCAB (2) ===
+  - id: ia-prompting-009
+    type: vocab
+    term_pt: "Engenharia de contexto"
+    term_en: "Context engineering"
+    definition: "Pratica de curar todo o conjunto de tokens que o modelo recebe em runtime: system prompt, historico, tools, RAG, notas. Maximizar sinal, minimizar ruido."
+    usage: "Context engineering is about managing the full token budget, not just writing a clever prompt."
+    tags: [ia, prompting, contexto, vocabulario]
+
+  - id: ia-prompting-010
+    type: vocab
+    term_pt: "Divulgacao progressiva"
+    term_en: "Progressive disclosure"
+    definition: "Padrao onde agentes descobrem detalhes sob demanda em vez de carregar tudo upfront. Reduz consumo de tokens e foca o contexto."
+    usage: "Our agent uses progressive disclosure: it loads the database schema only when the user asks a data question."
+    tags: [ia, prompting, agents, vocabulario]
+
+  # === SCENARIO (2) ===
+  - id: ia-prompting-011
+    type: scenario
+    situation: "Seu prompt funciona bem 70% das vezes mas falha em edge cases de formato de saida."
+    question: "Qual tecnica de prompting voce adicionaria primeiro?"
+    answer: "Few-shot examples mostrando o formato exato esperado, incluindo edge cases. Few-shot e a tecnica mais eficaz para consistencia de formato. Adicionar 2-3 exemplos representativos."
+    tags: [ia, prompting, tecnicas, cenario]
+
+  - id: ia-prompting-012
+    type: scenario
+    situation: "Seu agent consome 90K tokens de contexto e as respostas estao degradando."
+    question: "Como voce aplica context engineering para resolver?"
+    answer: "Aplicar compaction (resumir historico), structured note-taking fora da janela, progressive disclosure (carregar tools sob demanda), e sub-agents com contextos focados menores."
+    tags: [ia, prompting, contexto, cenario]
+
+  # === PITFALL (3) ===
+  - id: ia-prompting-013
+    type: pitfall
+    trap: "Escrever instrucoes em paragrafos longos no system prompt."
+    why: "Modelos seguem listas estruturadas com muito mais consistencia do que paragrafos. Instrucoes em prosa sao ignoradas parcialmente."
+    prevention: "Usar bullet points, numeracao, headers. Instrucoes positivas ('faca X') em vez de negativas ('nao faca Y')."
+    tags: [ia, prompting, systemprompt, armadilha]
+
+  - id: ia-prompting-014
+    type: pitfall
+    trap: "Nao delimitar dados do usuario no prompt, misturando com instrucoes do sistema."
+    why: "Sem delimitadores, conteudo do usuario pode ser interpretado como instrucao (prompt injection). O modelo nao distingue o que e comando do que e dado."
+    prevention: "Usar tags XML para separar blocos. Ex: <user_input>...</user_input>. Tratar conteudo externo como nao-confiavel."
+    tags: [ia, prompting, seguranca, armadilha]
+
+  - id: ia-prompting-015
+    type: pitfall
+    trap: "Reescrever o mesmo prompt manualmente em 10 projetos diferentes."
+    why: "Sem reutilizacao, cada variante diverge, nao e testada, e acumula inconsistencias. Bugs de prompt se multiplicam."
+    prevention: "Criar agent skills reutilizaveis, versionadas e testadas como codigo. Distribuir via repositorio compartilhado."
+    tags: [ia, prompting, skills, armadilha]

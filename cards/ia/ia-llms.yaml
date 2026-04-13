@@ -1,0 +1,139 @@
+source: "IA/LLMs.md"
+source_hash: "85b99d5874fb"
+deck: "Codex::IA"
+generated: "2026-04-13"
+tags:
+  - ia
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: ia-llms-001
+    type: basic
+    front: "What are the steps in the LLM inference pipeline?"
+    back: "Tokenize text -> embed tokens into vectors -> pass through transformer stack (self-attention + FFN layers) -> LM head produces logits over vocabulary -> sampling strategy selects next token. Repeat autoregressively."
+    tags:
+      - llms
+      - inferencia
+
+  - id: ia-llms-002
+    type: basic
+    front: "What is BPE tokenization and why does Portuguese cost more tokens than English?"
+    back: "Byte Pair Encoding merges frequent character pairs into sub-word tokens. English averages ~4 chars/token because training data is English-heavy. Portuguese averages ~3 chars/token, costing ~30% more tokens for equivalent text."
+    tags:
+      - llms
+      - tokenizacao
+
+  - id: ia-llms-003
+    type: basic
+    front: "What is the self-attention mechanism in transformers?"
+    back: "Each token produces Query, Key, Value vectors. Attention scores = Q dot K (how relevant is each other token). Scores are softmax-normalized, then used to weight V vectors. Complexity is O(n^2) with sequence length."
+    tags:
+      - llms
+      - attention
+
+  - id: ia-llms-004
+    type: basic
+    front: "What is the difference between system prompt, user prompt, and assistant messages in an LLM API?"
+    back: "System prompt sets behavior/persona and is the strongest lever. User prompt is the actual request. Assistant messages are prior model responses for multi-turn context. System prompt should use structured lists, not paragraphs."
+    tags:
+      - llms
+      - api
+
+  - id: ia-llms-005
+    type: basic
+    front: "How does prompt caching work and what cost reduction does it provide?"
+    back: "The API caches the prefix of your request (system prompt + few-shot examples). Subsequent calls with the same prefix hit the cache, reducing input token costs by up to 90%. Structure prompts with static content first."
+    tags:
+      - llms
+      - cache
+
+  # --- CLOZE (3) ---
+  - id: ia-llms-006
+    type: cloze
+    text: "In decoder-only transformers, each token can only attend to {{c1::previous tokens}} (causal masking). This makes generation {{c2::autoregressive}} — producing one token at a time, left to right."
+    tags:
+      - llms
+      - transformer
+
+  - id: ia-llms-007
+    type: cloze
+    text: "Tool use in LLMs works by the model returning a {{c1::JSON object}} specifying which function to call and with what arguments. The application executes the function and sends the {{c2::result back}} to the model for the next step."
+    tags:
+      - llms
+      - tools
+
+  - id: ia-llms-008
+    type: cloze
+    text: "The LLM alignment pipeline is: pretraining on raw text, then {{c1::SFT}} (supervised fine-tuning) on instruction pairs, then {{c2::RLHF}} using human preference rankings. This explains behaviors like refusals and sycophancy."
+    tags:
+      - llms
+      - alinhamento
+
+  # --- VOCAB (2) ---
+  - id: ia-llms-009
+    type: vocab
+    term_pt: "saída estruturada"
+    term_en: "structured output"
+    definition: "API mode (JSON mode) that constrains the LLM to produce only valid JSON matching a schema. Eliminates parsing errors and reduces retries."
+    usage: "We enabled structured outputs on our extraction endpoint, dropping invalid response rate from 8% to zero."
+    tags:
+      - llms
+      - json
+
+  - id: ia-llms-010
+    type: vocab
+    term_pt: "amostragem nucleus"
+    term_en: "nucleus sampling (top_p)"
+    definition: "Sampling strategy that considers only the smallest set of tokens whose cumulative probability exceeds p. Dynamically adjusts candidate pool size per step."
+    usage: "We set top_p to 0.9 for creative writing tasks, giving the model freedom while excluding very unlikely tokens."
+    tags:
+      - llms
+      - sampling
+
+  # --- SCENARIO (2) ---
+  - id: ia-llms-011
+    type: scenario
+    situation: "Your chatbot API returns valid but inconsistent JSON — sometimes keys are missing or have wrong types, causing frontend crashes."
+    question: "How would you fix this at the LLM API level?"
+    answer: "Enable structured outputs / JSON mode with a strict schema. The API will constrain generation to always match the schema. This eliminates invalid JSON and missing fields without post-processing regex hacks."
+    tags:
+      - llms
+      - json
+
+  - id: ia-llms-012
+    type: scenario
+    situation: "Users complain your AI assistant feels slow — responses take 3-5 seconds before any text appears on screen."
+    question: "What API-level change would improve perceived latency?"
+    answer: "Enable streaming. Instead of waiting for the full response, stream tokens as they are generated. First token appears in ~200ms. Use SSE (Server-Sent Events) on the backend and progressive rendering on the frontend."
+    tags:
+      - llms
+      - streaming
+
+  # --- PITFALL (3) ---
+  - id: ia-llms-013
+    type: pitfall
+    trap: "Setting both temperature and top_p to non-default values simultaneously."
+    why: "They both control randomness in different ways. Combining them creates unpredictable interactions — the effective distribution is doubly constrained in ways that are hard to reason about."
+    prevention: "Pick one: use temperature for general creativity control, or top_p for more precise probability-mass control. Set the other to its default value (temperature=1 or top_p=1)."
+    tags:
+      - llms
+      - sampling
+
+  - id: ia-llms-014
+    type: pitfall
+    trap: "Writing system prompts as long paragraphs of prose."
+    why: "LLMs process structured text better than prose. Important rules buried in paragraphs get lower attention weight. The lost-in-the-middle effect means middle content is most likely forgotten."
+    prevention: "Use bullet points and numbered lists. Place critical rules at the very start AND end of the system prompt. Keep it concise and scannable."
+    tags:
+      - llms
+      - prompting
+
+  - id: ia-llms-015
+    type: pitfall
+    trap: "Not using prompt caching when your system prompt and few-shot examples are static."
+    why: "Without caching, you pay full input token cost on every request. For a 4K-token system prompt at thousands of requests/day, this adds up fast — potentially 10x more than necessary."
+    prevention: "Structure prompts with static content (system prompt, few-shot) as a prefix. Enable prompt caching via the API. Monitor cache hit rates in your observability dashboard."
+    tags:
+      - llms
+      - custo

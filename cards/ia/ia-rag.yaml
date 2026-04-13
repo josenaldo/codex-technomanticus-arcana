@@ -1,0 +1,109 @@
+source: "IA/RAG e Vector Databases.md"
+source_hash: "e12545dd48dc"
+deck: "Codex::IA"
+generated: "2026-04-13"
+tags:
+  - ia
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+  - id: ia-rag-001
+    type: basic
+    front: "O que e RAG e por que e preferido a fine-tuning para dados especificos?"
+    back: "Retrieval-Augmented Generation injeta dados relevantes no contexto do LLM em runtime. Mais barato que fine-tuning, atualizacao instantanea (troca documentos), e permite citar fontes."
+    tags: [ia, rag, conceito]
+
+  - id: ia-rag-002
+    type: basic
+    front: "Qual o pipeline completo de RAG em duas fases?"
+    back: "Indexing (offline): parse, chunk, embed, store. Query (online): rewrite query, embed, retrieve, rerank, generate. A qualidade depende de cada etapa, nao so do LLM."
+    tags: [ia, rag, pipeline]
+
+  - id: ia-rag-003
+    type: basic
+    front: "Por que hybrid search (BM25 + vector) e padrao em producao e nao pure vector?"
+    back: "Vector search falha em termos exatos (nomes, codigos, IDs). BM25 cobre busca lexica. Combinados via RRF (Reciprocal Rank Fusion), cobrem ambos os casos."
+    tags: [ia, rag, retrieval]
+
+  - id: ia-rag-004
+    type: basic
+    front: "Qual o sweet spot de tamanho de chunks e por que chunking importa tanto?"
+    back: "300-800 tokens com overlap de 10-20%. Chunking e onde ~50% da qualidade do RAG vive. Chunks muito grandes diluem relevancia; muito pequenos perdem contexto."
+    tags: [ia, rag, chunking]
+
+  - id: ia-rag-005
+    type: basic
+    front: "Quais metricas avaliam a qualidade de um sistema RAG?"
+    back: "Context precision (relevancia dos trechos), context recall (cobertura), faithfulness (resposta fiel ao contexto), answer relevance (resposta util). Ferramentas: Ragas, TruLens, DeepEval."
+    tags: [ia, rag, avaliacao]
+
+  # === CLOZE (3) ===
+  - id: ia-rag-006
+    type: cloze
+    text: "Em RAG, {{c1::reranking}} adiciona 15-30% de melhoria na qualidade do retrieval apos o primeiro passo de busca."
+    tags: [ia, rag, retrieval]
+
+  - id: ia-rag-007
+    type: cloze
+    text: "A estrategia {{c1::HyDE}} gera um documento hipotetico a partir da query e usa seu embedding para buscar, melhorando retrieval de perguntas vagas."
+    tags: [ia, rag, queryrewriting]
+
+  - id: ia-rag-008
+    type: cloze
+    text: "RAG com {{c1::4K}} tokens relevantes geralmente supera dump de todo o contexto no prompt, pois mais tokens nao significa {{c2::melhor}} qualidade."
+    tags: [ia, rag, contexto]
+
+  # === VOCAB (2) ===
+  - id: ia-rag-009
+    type: vocab
+    term_pt: "Embedding"
+    term_en: "Embedding"
+    definition: "Representacao vetorial densa de texto num espaco de alta dimensao. Similaridade entre vetores (cosseno) indica proximidade semantica."
+    usage: "We use voyage-3 embeddings with 1024 dimensions and cosine similarity for our RAG retrieval."
+    tags: [ia, rag, embeddings, vocabulario]
+
+  - id: ia-rag-010
+    type: vocab
+    term_pt: "Banco de dados vetorial"
+    term_en: "Vector database"
+    definition: "Banco especializado em armazenar e buscar vetores de alta dimensao. Usa indice HNSW para busca aproximada eficiente."
+    usage: "We started with pgvector and migrated to Pinecone when we needed to scale beyond 10M vectors."
+    tags: [ia, rag, vectordb, vocabulario]
+
+  # === SCENARIO (2) ===
+  - id: ia-rag-011
+    type: scenario
+    situation: "Seu RAG retorna trechos relevantes mas o LLM gera respostas que contradizem o contexto recuperado."
+    question: "Qual metrica esta falhando e como investigar?"
+    answer: "Faithfulness esta baixa. O LLM esta 'alucinando' sobre o contexto. Investigar: prompt do system, temperatura, e se o contexto e ambiguo. Adicionar instrucao explicita para citar fontes."
+    tags: [ia, rag, avaliacao, cenario]
+
+  - id: ia-rag-012
+    type: scenario
+    situation: "Usuarios reclamam que o RAG nao acha documentos quando buscam por codigos de produto exatos (ex: SKU-12345)."
+    question: "Qual a causa provavel e a solucao?"
+    answer: "Pure vector search nao e boa para match exato. Solucao: implementar hybrid search com BM25 para termos lexicos + vector para semantica, combinados via RRF."
+    tags: [ia, rag, retrieval, cenario]
+
+  # === PITFALL (3) ===
+  - id: ia-rag-013
+    type: pitfall
+    trap: "Usar apenas vector search sem BM25 em producao."
+    why: "Embeddings capturam semantica mas falham em termos exatos: nomes proprios, codigos, siglas. Usuarios nao encontram o que buscam por keyword."
+    prevention: "Implementar hybrid search (BM25 + vector) com RRF como padrao. Pure vector so para prototipo."
+    tags: [ia, rag, retrieval, armadilha]
+
+  - id: ia-rag-014
+    type: pitfall
+    trap: "Chunks sem metadata (titulo, secao, data, fonte)."
+    why: "Sem metadata, retrieval nao pode filtrar por dominio, data ou tipo. Reranker perde sinal. Resposta nao pode citar fonte."
+    prevention: "Sempre anexar metadata ao chunk: titulo do doc, secao, data, tags. Habilitar metadata filtering no retrieval."
+    tags: [ia, rag, chunking, armadilha]
+
+  - id: ia-rag-015
+    type: pitfall
+    trap: "Avaliar RAG apenas pela qualidade da resposta final sem medir retrieval separadamente."
+    why: "Se retrieval falha, generation nao salva. Voce otimiza o prompt do LLM quando o problema real e que os chunks errados foram recuperados."
+    prevention: "Medir context precision e context recall separadamente. Criar golden set com (pergunta, contexto esperado, resposta)."
+    tags: [ia, rag, avaliacao, armadilha]

@@ -1,0 +1,139 @@
+source: "IA/Inteligência Artificial.md"
+source_hash: "dbdfb9e0dd29"
+deck: "Codex::IA"
+generated: "2026-04-13"
+tags:
+  - ia
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: ia-fundamentos-001
+    type: basic
+    front: "What is the hierarchy from AI to LLMs?"
+    back: "AI (broadest) -> Machine Learning -> Deep Learning -> Generative AI -> Large Language Models. Each is a subset of the previous. LLMs are a specific type of GenAI using transformers trained on massive text corpora."
+    tags:
+      - fundamentos
+      - hierarquia
+
+  - id: ia-fundamentos-002
+    type: basic
+    front: "What are the 3 axes a senior dev should consider when working with AI?"
+    back: "Tool (use AI to boost productivity), Feature (integrate AI into products for users), and Infrastructure (build/deploy/scale AI systems). A senior dev should understand all three to make informed architectural decisions."
+    tags:
+      - fundamentos
+      - senior
+
+  - id: ia-fundamentos-003
+    type: basic
+    front: "What is the difference between supervised and unsupervised learning?"
+    back: "Supervised: model learns from labeled data (input-output pairs), used for classification and regression. Unsupervised: model finds patterns in unlabeled data, used for clustering and dimensionality reduction."
+    tags:
+      - fundamentos
+      - aprendizado
+
+  - id: ia-fundamentos-004
+    type: basic
+    front: "Why is accuracy misleading with imbalanced datasets?"
+    back: "A model predicting always 'healthy' on 99% healthy / 1% sick data gets 99% accuracy but catches zero sick patients. Use precision, recall, and F1-score instead. Recall matters when missing positives is costly."
+    tags:
+      - fundamentos
+      - metricas
+
+  - id: ia-fundamentos-005
+    type: basic
+    front: "What is the decision tree for customizing LLM behavior: prompting vs RAG vs fine-tuning?"
+    back: "Start with prompting (cheapest, fastest). If the model lacks domain knowledge, add RAG (retrieval). Fine-tuning is last resort — expensive, requires data, creates maintenance burden. Most production cases need only prompting + RAG."
+    tags:
+      - fundamentos
+      - customizacao
+
+  # --- CLOZE (3) ---
+  - id: ia-fundamentos-006
+    type: cloze
+    text: "Overfitting is like a student who {{c1::memorized the exam}} — perfect on training data but fails on new data. Underfitting is like a student who {{c2::didn't study enough}} — poor on both training and new data."
+    tags:
+      - fundamentos
+      - overfitting
+
+  - id: ia-fundamentos-007
+    type: cloze
+    text: "Temperature controls randomness in LLM output: {{c1::0}} gives deterministic results, while {{c2::0.7+}} increases creativity. Never use temperature and top_p together — pick one."
+    tags:
+      - fundamentos
+      - temperatura
+
+  - id: ia-fundamentos-008
+    type: cloze
+    text: "The LLM training pipeline has 4 stages: {{c1::pretraining}} on massive text, SFT (supervised fine-tuning) for instruction following, {{c2::RLHF}} for alignment with human preferences, and Constitutional AI for safety."
+    tags:
+      - fundamentos
+      - treinamento
+
+  # --- VOCAB (2) ---
+  - id: ia-fundamentos-009
+    type: vocab
+    term_pt: "embeddings"
+    term_en: "embeddings"
+    definition: "Dense vector representations of text where semantic similarity maps to geometric proximity. Words with similar meaning have nearby vectors."
+    usage: "We use embeddings to find semantically similar documents in our RAG pipeline, even when they share no exact keywords."
+    tags:
+      - fundamentos
+      - embeddings
+
+  - id: ia-fundamentos-010
+    type: vocab
+    term_pt: "janela de contexto"
+    term_en: "context window"
+    definition: "Maximum number of tokens an LLM can process in a single request (input + output). Exceeding it causes truncation or errors."
+    usage: "Our context window is 200K tokens, but due to context rot, we keep prompts under 50K for reliable results."
+    tags:
+      - fundamentos
+      - contexto
+
+  # --- SCENARIO (2) ---
+  - id: ia-fundamentos-011
+    type: scenario
+    situation: "Your team wants to add AI-powered document search to a product with 50K internal docs. A colleague suggests fine-tuning GPT-4 on the documents."
+    question: "What approach would you recommend instead and why?"
+    answer: "Use RAG: embed documents into a vector store, retrieve relevant chunks at query time, and pass them as context. Fine-tuning teaches style, not facts. RAG keeps knowledge updatable without retraining and costs far less."
+    tags:
+      - fundamentos
+      - rag
+
+  - id: ia-fundamentos-012
+    type: scenario
+    situation: "A fraud detection model shows 99.5% accuracy but the fraud team says it misses most actual fraud cases."
+    question: "What metric should you focus on and why?"
+    answer: "Focus on recall (sensitivity) for the fraud class. High accuracy masks poor fraud detection because the dataset is imbalanced. Use precision-recall curves and F1-score to evaluate. Consider the business cost of missed fraud vs false alarms."
+    tags:
+      - fundamentos
+      - metricas
+
+  # --- PITFALL (3) ---
+  - id: ia-fundamentos-013
+    type: pitfall
+    trap: "Treating LLM output as deterministic and reliable without validation."
+    why: "LLMs are probabilistic — same prompt can yield different outputs. They hallucinate facts confidently. Temperature 0 reduces but doesn't eliminate variation across API versions."
+    prevention: "Always validate LLM outputs programmatically. Use structured outputs, assertions, and golden test sets for evaluation. Never trust raw LLM output for critical decisions."
+    tags:
+      - fundamentos
+      - armadilha
+
+  - id: ia-fundamentos-014
+    type: pitfall
+    trap: "Dumping entire documents into the context window because it's large enough."
+    why: "Context rot — models lose accuracy on information in the middle of long contexts (lost-in-the-middle effect). More tokens also means higher cost and latency."
+    prevention: "Use RAG to retrieve only relevant chunks. Place critical information at the start and end of the prompt. Monitor cost per request."
+    tags:
+      - fundamentos
+      - contexto
+
+  - id: ia-fundamentos-015
+    type: pitfall
+    trap: "Jumping to fine-tuning as the first solution for customizing LLM behavior."
+    why: "Fine-tuning is expensive, requires quality training data, creates model maintenance burden, and can degrade general capabilities. Most use cases are solved by better prompting or RAG."
+    prevention: "Follow the decision tree: prompting first, then RAG, fine-tuning only as last resort. Document why simpler approaches failed before investing in fine-tuning."
+    tags:
+      - fundamentos
+      - finetuning
