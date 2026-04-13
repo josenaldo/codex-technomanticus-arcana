@@ -1,0 +1,48 @@
+source: "Fundamentos/Teste.md"
+source_hash: "bad123"
+deck: "Codex::Fundamentos"
+generated: "2026-04-12"
+tags:
+  - fundamentos
+
+cards:
+  # Missing back field
+  - id: fund-teste-001
+    type: basic
+    front: "Pergunta sem resposta?"
+    tags: [testes]
+
+  # Invalid cloze — no {{c1::}}
+  - id: fund-teste-002
+    type: cloze
+    text: "Texto sem cloze marker nenhum."
+    tags: [testes]
+
+  # Incomplete vocab — missing definition
+  - id: fund-teste-003
+    type: vocab
+    term_pt: "Teste"
+    term_en: "Test"
+    tags: []
+
+  # Invalid ID format
+  - id: invalid_id_format
+    type: basic
+    front: "Pergunta?"
+    back: "Resposta."
+    tags: [testes]
+
+  # Duplicate front
+  - id: fund-teste-005
+    type: basic
+    front: "Pergunta sem resposta?"
+    back: "Agora com resposta."
+    tags: [testes]
+
+  # Empty tags
+  - id: fund-teste-006
+    type: scenario
+    situation: "Situação"
+    question: "Pergunta"
+    answer: "Resposta"
+    tags: []
