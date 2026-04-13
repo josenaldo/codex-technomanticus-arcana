@@ -1,0 +1,144 @@
+source: "Infraestrutura/Linux.md"
+source_hash: "ecdff1df55e4"
+deck: "Codex::Infraestrutura"
+generated: "2026-04-13"
+tags:
+  - infraestrutura
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: infra-linux-001
+    type: basic
+    front: "In the Filesystem Hierarchy Standard, what are /etc, /var/log, and /proc used for?"
+    back: "/etc stores system-wide configuration files. /var/log stores log files from services and the kernel. /proc is a virtual filesystem exposing kernel and process information as files (not on disk)."
+    tags:
+      - linux
+      - filesystem
+
+  - id: infra-linux-002
+    type: basic
+    front: "What is the difference between SIGTERM (15) and SIGKILL (9) in Linux?"
+    back: "SIGTERM asks a process to terminate gracefully — the process can catch it, clean up, and exit. SIGKILL forcefully kills the process immediately — it cannot be caught or ignored. Always try SIGTERM first."
+    tags:
+      - linux
+      - processes
+      - signals
+
+  - id: infra-linux-003
+    type: basic
+    front: "What does the permission mode 755 mean in Linux?"
+    back: "Owner has read+write+execute (7), group has read+execute (5), others have read+execute (5). In symbolic notation: rwxr-xr-x. Common for directories and executable scripts."
+    tags:
+      - linux
+      - permissions
+
+  - id: infra-linux-004
+    type: basic
+    front: "What does `set -euo pipefail` do at the top of a bash script?"
+    back: "`-e` exits on any command failure. `-u` treats unset variables as errors. `-o pipefail` makes a pipeline fail if any command in it fails, not just the last one. Essential for robust scripts."
+    tags:
+      - linux
+      - scripting
+
+  - id: infra-linux-005
+    type: basic
+    front: "How do you view logs for a specific systemd service in real-time?"
+    back: "Use `journalctl -u service-name -f` to follow live logs. Add `--since '1 hour ago'` to filter by time. Use `systemctl status service-name` for a quick summary with recent log lines."
+    tags:
+      - linux
+      - systemd
+      - logging
+
+  # --- CLOZE (3) ---
+  - id: infra-linux-006
+    type: cloze
+    text: "Linux containers are built on two kernel features: {{c1::namespaces}} for process isolation (PID, network, mount) and {{c2::cgroups}} for resource limiting (CPU, memory, I/O)."
+    tags:
+      - linux
+      - containers
+
+  - id: infra-linux-007
+    type: cloze
+    text: "The command `ss -tlnp` shows {{c1::listening TCP sockets}} with process names. The flags mean: -t TCP, -l listening, -n numeric ports, -p {{c2::show process}} using each socket."
+    tags:
+      - linux
+      - networking
+
+  - id: infra-linux-008
+    type: cloze
+    text: "The SUID bit on an executable means it runs with the {{c1::file owner's}} permissions instead of the invoking user's. The sticky bit on a directory means only the {{c2::file owner}} can delete their own files."
+    tags:
+      - linux
+      - permissions
+
+  # --- VOCAB (2) ---
+  - id: infra-linux-009
+    type: vocab
+    term_pt: "redirecionamento"
+    term_en: "redirection"
+    definition: "Shell mechanism to send command output to a file (> overwrites, >> appends) or read input from a file (<) instead of using the terminal."
+    usage: "We use redirection with `tee` to both display output on screen and save it to a log file simultaneously."
+    tags:
+      - linux
+      - shell
+
+  - id: infra-linux-010
+    type: vocab
+    term_pt: "gerenciador de pacotes"
+    term_en: "package manager"
+    definition: "Tool that automates installing, upgrading, configuring, and removing software packages, handling dependencies automatically."
+    usage: "On Debian/Ubuntu use apt, on Fedora/RHEL use dnf, on Arch use pacman, and on Alpine use apk as the package manager."
+    tags:
+      - linux
+      - packages
+
+  # --- SCENARIO (2) ---
+  - id: infra-linux-011
+    type: scenario
+    situation: "A production server is running slowly. You SSH in and need to find which process is consuming the most CPU and memory."
+    question: "What commands do you use to diagnose this?"
+    answer: "Run `top` or `htop` for real-time resource view. Use `ps aux --sort=-%cpu | head` for top CPU consumers and `ps aux --sort=-%mem | head` for memory. Check disk I/O with `iotop` if needed."
+    tags:
+      - linux
+      - troubleshooting
+      - processes
+
+  - id: infra-linux-012
+    type: scenario
+    situation: "You need to find all lines containing 'ERROR' in logs across /var/log, extract the timestamp column, and count occurrences per hour."
+    question: "How do you build this pipeline?"
+    answer: "Use `grep -r 'ERROR' /var/log/ | awk '{print $1}' | cut -d: -f1-2 | sort | uniq -c | sort -rn`. This chains grep for filtering, awk for column extraction, and sort|uniq for counting."
+    tags:
+      - linux
+      - text-processing
+      - shell
+
+  # --- PITFALL (3) ---
+  - id: infra-linux-013
+    type: pitfall
+    trap: "Using `kill -9` (SIGKILL) as the first approach to stop a stuck process."
+    why: "SIGKILL prevents the process from cleaning up — temp files remain, database connections hang, buffers don't flush. This can cause data corruption or resource leaks."
+    prevention: "Always send SIGTERM first (`kill PID`), wait a few seconds, then escalate to SIGKILL only if the process doesn't respond."
+    tags:
+      - linux
+      - processes
+
+  - id: infra-linux-014
+    type: pitfall
+    trap: "Running `chmod -R 777 /var/www` to fix a permission denied error quickly."
+    why: "777 gives everyone read, write, and execute access, creating a massive security hole. Any user or compromised service can modify or execute files."
+    prevention: "Use least-privilege: 755 for directories, 644 for files. Set proper ownership with chown and use groups for shared access."
+    tags:
+      - linux
+      - permissions
+      - security
+
+  - id: infra-linux-015
+    type: pitfall
+    trap: "Writing a bash script without `set -euo pipefail` and missing silent failures."
+    why: "Without these flags, failed commands are silently ignored, unset variables expand to empty strings, and only the last command in a pipeline determines success/failure."
+    prevention: "Always start scripts with `#!/bin/bash` and `set -euo pipefail`. Use `|| true` explicitly when a command is allowed to fail."
+    tags:
+      - linux
+      - scripting

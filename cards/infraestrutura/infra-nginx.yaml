@@ -1,0 +1,140 @@
+source: "Infraestrutura/Nginx.md"
+source_hash: "a4817c82bc91"
+deck: "Codex::Infraestrutura"
+generated: "2026-04-13"
+tags:
+  - infraestrutura
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: infra-nginx-001
+    type: basic
+    front: "Describe Nginx's process architecture. How many worker processes should you configure?"
+    back: "Nginx uses a master process that manages multiple worker processes. Each worker is single-threaded and handles thousands of connections via epoll (Linux). Set workers equal to CPU cores for optimal performance."
+    tags:
+      - nginx
+      - architecture
+
+  - id: infra-nginx-002
+    type: basic
+    front: "What is the location matching order in Nginx?"
+    back: "1) `= /path` exact match (stops). 2) `^~ /prefix` literal prefix (stops). 3) `~ regex` or `~* regex` case-insensitive (first match in config order). 4) Longest non-regex prefix match."
+    tags:
+      - nginx
+      - configuration
+
+  - id: infra-nginx-003
+    type: basic
+    front: "How do you pass the real client IP to a backend behind an Nginx reverse proxy?"
+    back: "Use proxy_set_header to forward X-Forwarded-For, X-Real-IP, and X-Forwarded-Proto headers. The backend must trust the proxy IP and read these headers instead of the direct connection source."
+    tags:
+      - nginx
+      - reverse-proxy
+
+  - id: infra-nginx-004
+    type: basic
+    front: "What is the difference between Nginx 502 Bad Gateway and 504 Gateway Timeout?"
+    back: "502 means Nginx could not get a valid response from the upstream (backend is down or crashed). 504 means the upstream did not respond within the configured timeout (backend is alive but too slow)."
+    tags:
+      - nginx
+      - troubleshooting
+
+  - id: infra-nginx-005
+    type: basic
+    front: "Name three load balancing algorithms available in Nginx upstream blocks."
+    back: "Round-robin (default, rotates sequentially), least_conn (sends to server with fewest active connections), ip_hash (sticky sessions based on client IP hash). Also available: hash (custom key)."
+    tags:
+      - nginx
+      - load-balancing
+
+  # --- CLOZE (3) ---
+  - id: infra-nginx-006
+    type: cloze
+    text: "Nginx uses approximately {{c1::2.5 KB}} of memory per connection, which is why it can handle thousands of concurrent connections with minimal RAM compared to thread-per-connection servers."
+    tags:
+      - nginx
+      - performance
+
+  - id: infra-nginx-007
+    type: cloze
+    text: "For TLS hardening in Nginx, restrict protocols to {{c1::TLSv1.2 and TLSv1.3}} only, enable {{c2::OCSP stapling}} to speed up certificate validation, and add HSTS headers."
+    tags:
+      - nginx
+      - security
+      - tls
+
+  - id: infra-nginx-008
+    type: cloze
+    text: "Nginx rate limiting uses the {{c1::limit_req_zone}} directive to define a shared memory zone and rate, combined with {{c2::burst}} to allow temporary spikes before rejecting requests."
+    tags:
+      - nginx
+      - rate-limiting
+
+  # --- VOCAB (2) ---
+  - id: infra-nginx-009
+    type: vocab
+    term_pt: "proxy reverso"
+    term_en: "reverse proxy"
+    definition: "A server that sits in front of backend servers, forwarding client requests and returning responses as if they originated from the proxy itself."
+    usage: "We use Nginx as a reverse proxy to terminate TLS, load-balance across app servers, and hide internal topology."
+    tags:
+      - nginx
+      - reverse-proxy
+
+  - id: infra-nginx-010
+    type: vocab
+    term_pt: "balanceamento de carga"
+    term_en: "load balancing"
+    definition: "Distributing incoming network traffic across multiple backend servers to improve availability, throughput, and fault tolerance."
+    usage: "Our Nginx upstream block uses least_conn load balancing to route traffic to the server with fewest active connections."
+    tags:
+      - nginx
+      - load-balancing
+
+  # --- SCENARIO (2) ---
+  - id: infra-nginx-011
+    type: scenario
+    situation: "Your app needs WebSocket support behind Nginx. Connections drop after 60 seconds of inactivity."
+    question: "What Nginx configuration changes are needed?"
+    answer: "Add `proxy_set_header Upgrade $http_upgrade;` and `proxy_set_header Connection \"upgrade\";` plus increase `proxy_read_timeout` beyond 60s. The Upgrade headers enable the HTTP-to-WebSocket protocol switch."
+    tags:
+      - nginx
+      - websocket
+
+  - id: infra-nginx-012
+    type: scenario
+    situation: "After editing nginx.conf, you reload Nginx and the site goes down completely."
+    question: "What critical step was missed and how do you recover?"
+    answer: "Always run `nginx -t` before reload to validate syntax. To recover, check error logs at /var/log/nginx/error.log, fix the config, run `nginx -t`, then `systemctl reload nginx`."
+    tags:
+      - nginx
+      - troubleshooting
+
+  # --- PITFALL (3) ---
+  - id: infra-nginx-013
+    type: pitfall
+    trap: "Using proxy_pass without a trailing slash and getting unexpected path behavior."
+    why: "With `proxy_pass http://backend;` (no trailing slash), Nginx forwards the full original URI. With `proxy_pass http://backend/;` (trailing slash), it strips the matched location prefix."
+    prevention: "Always test path forwarding with curl. Use trailing slash on proxy_pass when you want location prefix stripped from the upstream request."
+    tags:
+      - nginx
+      - reverse-proxy
+
+  - id: infra-nginx-014
+    type: pitfall
+    trap: "Setting worker_processes to a very high number thinking it improves performance."
+    why: "Workers beyond CPU core count cause context switching overhead. Nginx workers are event-driven and non-blocking, so one worker per core is optimal."
+    prevention: "Set `worker_processes auto;` to let Nginx detect CPU cores automatically."
+    tags:
+      - nginx
+      - performance
+
+  - id: infra-nginx-015
+    type: pitfall
+    trap: "Forgetting to add security headers like X-Frame-Options and X-Content-Type-Options."
+    why: "Missing headers expose the app to clickjacking (iframe embedding) and MIME-type sniffing attacks where browsers execute files as unexpected content types."
+    prevention: "Add `add_header X-Frame-Options DENY;`, `X-Content-Type-Options nosniff;`, and `Referrer-Policy strict-origin-when-cross-origin;` in the server block."
+    tags:
+      - nginx
+      - security

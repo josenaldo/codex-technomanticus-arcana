@@ -1,0 +1,121 @@
+source: "Infraestrutura/Kubernetes.md"
+source_hash: "a0dd7d2be45a"
+deck: "Codex::Infraestrutura"
+generated: "2026-04-13"
+tags:
+  - infraestrutura
+  - entrevista
+
+cards:
+  - id: infra-kubernetes-001
+    type: basic
+    front: "Quais os componentes do control plane do Kubernetes?"
+    back: |
+      API Server (ponto de entrada), etcd (armazenamento de estado),
+      Scheduler (atribui Pods a Nodes), Controller Manager
+      (reconcilia estado desejado vs atual). Todos stateless exceto etcd.
+    tags: [kubernetes, arquitetura]
+
+  - id: infra-kubernetes-002
+    type: basic
+    front: "Qual a diferença entre liveness, readiness e startup probes?"
+    back: |
+      Liveness: falha → restart do container. Readiness: falha →
+      remove do load balancer (não recebe tráfego). Startup: desabilita
+      as outras probes durante inicialização lenta, evitando restart prematuro.
+    tags: [kubernetes, probes, saude]
+
+  - id: infra-kubernetes-003
+    type: basic
+    front: "Qual a diferença entre requests e limits de recursos no Kubernetes?"
+    back: |
+      Requests = recursos garantidos (usados no scheduling).
+      Limits = máximo permitido. CPU excedido é throttled.
+      Memória excedida causa OOMKilled. Definem a classe QoS
+      do Pod (Guaranteed, Burstable, BestEffort).
+    tags: [kubernetes, recursos, scheduling]
+
+  - id: infra-kubernetes-004
+    type: basic
+    front: "Por que raramente criamos Pods diretamente no Kubernetes?"
+    back: |
+      Pods são efêmeros e não se recuperam sozinhos. Usamos
+      controllers (Deployment, StatefulSet, DaemonSet) que
+      garantem reconciliação: recriam Pods automaticamente
+      se falham, e gerenciam rolling updates.
+    tags: [kubernetes, pods, conceitos]
+
+  - id: infra-kubernetes-005
+    type: basic
+    front: "Quais são os 4 tipos de Service no Kubernetes?"
+    back: |
+      ClusterIP (interno, padrão), NodePort (expõe porta fixa em cada nó),
+      LoadBalancer (provisiona LB externo do cloud provider),
+      Headless (sem IP, retorna IPs dos Pods — para StatefulSets).
+    tags: [kubernetes, services, rede]
+
+  - id: infra-kubernetes-006
+    type: cloze
+    text: "O modelo do Kubernetes é {{c1::declarativo}}: você define o estado desejado no manifesto e o control plane faz {{c2::reconciliação}} contínua para alcançá-lo."
+    tags: [kubernetes, conceitos]
+
+  - id: infra-kubernetes-007
+    type: cloze
+    text: "Rolling update no Deployment é controlado por {{c1::maxSurge}} (Pods extras permitidos) e {{c2::maxUnavailable}} (Pods indisponíveis permitidos)."
+    tags: [kubernetes, deployment, atualizacao]
+
+  - id: infra-kubernetes-008
+    type: cloze
+    text: "ConfigMap armazena configuração não sensível. Secret armazena dados sensíveis, mas usa apenas {{c1::base64}} — para criptografia real, use {{c2::External Secrets Operator}}."
+    tags: [kubernetes, configuracao, seguranca]
+
+  - id: infra-kubernetes-009
+    type: vocab
+    term_pt: "StatefulSet"
+    term_en: "StatefulSet"
+    definition: "Controller para workloads stateful. Garante nomes estáveis (pod-0, pod-1), volumes persistentes individuais e criação/deleção ordenada."
+    usage: "Use para bancos de dados, Kafka brokers ou qualquer app que precise de identidade estável e storage persistente."
+    tags: [kubernetes, statefulset, vocabulario]
+
+  - id: infra-kubernetes-010
+    type: vocab
+    term_pt: "Ingress"
+    term_en: "Ingress"
+    definition: "Recurso que define regras de roteamento HTTP/HTTPS externo para Services internos. Requer um Ingress Controller instalado no cluster."
+    usage: "Use Ingress para TLS termination, path-based routing e virtual hosts em vez de múltiplos LoadBalancer Services."
+    tags: [kubernetes, rede, vocabulario]
+
+  - id: infra-kubernetes-011
+    type: scenario
+    situation: "Pods novos de um Deployment começam a receber tráfego antes da aplicação estar pronta, causando erros 503."
+    question: "Como resolver?"
+    answer: "Configure readiness probe. Sem ela, o Pod entra no Service assim que inicia. A readiness probe só adiciona o Pod ao load balancer quando a app responde com sucesso."
+    tags: [kubernetes, probes, troubleshooting]
+
+  - id: infra-kubernetes-012
+    type: scenario
+    situation: "Seu cluster permite tráfego entre todos os Pods de todos os namespaces por padrão."
+    question: "Como implementar isolamento de rede?"
+    answer: "Aplique NetworkPolicy default-deny em cada namespace e depois crie policies explícitas permitindo apenas o tráfego necessário (whitelist approach)."
+    tags: [kubernetes, seguranca, rede]
+
+  - id: infra-kubernetes-013
+    type: pitfall
+    trap: "Definir apenas limits sem requests nos recursos do Pod"
+    why: "Sem requests, o scheduler não sabe os recursos necessários. O Pod pode ser alocado em nó sem capacidade, causando contention e OOMKill sob carga."
+    prevention: "Sempre defina requests (garantia) e limits (teto). Para Guaranteed QoS, faça requests = limits."
+    tags: [kubernetes, recursos, armadilhas]
+
+  - id: infra-kubernetes-014
+    type: pitfall
+    trap: "Usar liveness probe apontando para dependência externa (ex: banco de dados)"
+    why: "Se o banco cair, todos os Pods reiniciam em cascata, piorando a situação. Liveness deve verificar apenas a saúde do próprio processo."
+    prevention: "Liveness: verifica o processo local. Readiness: pode verificar dependências para parar de receber tráfego."
+    tags: [kubernetes, probes, armadilhas]
+
+  - id: infra-kubernetes-015
+    type: pitfall
+    trap: "Armazenar secrets do Kubernetes achando que estão criptografados"
+    why: "Secrets são apenas base64 encoded, não criptografados. Qualquer pessoa com acesso ao etcd ou permissão RBAC pode ler."
+    prevention: "Habilite encryption at rest no etcd. Use External Secrets Operator ou Sealed Secrets para gestão segura."
+    tags: [kubernetes, seguranca, armadilhas]

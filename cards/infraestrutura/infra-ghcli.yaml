@@ -1,0 +1,144 @@
+source: "Infraestrutura/GitHub CLI.md"
+source_hash: "9f415f63aaec"
+deck: "Codex::Infraestrutura"
+generated: "2026-04-13"
+tags:
+  - infraestrutura
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: infra-ghcli-001
+    type: basic
+    front: "How do you authenticate GitHub CLI in a CI/CD environment without a browser?"
+    back: "Set the GH_TOKEN environment variable with a personal access token or GitHub Actions token. The CLI detects it automatically — no interactive `gh auth login` needed."
+    tags:
+      - ghcli
+      - authentication
+      - ci-cd
+
+  - id: infra-ghcli-002
+    type: basic
+    front: "How do you create a GitHub repo from an existing local directory using gh?"
+    back: "Run `gh repo create repo-name --source . --push --public` (or --private). The --source flag links the current directory, and --push pushes the existing commits to the new remote."
+    tags:
+      - ghcli
+      - repository
+
+  - id: infra-ghcli-003
+    type: basic
+    front: "How do you create a pull request from the current branch using GitHub CLI?"
+    back: "Run `gh pr create --title 'PR title' --body 'Description'`. It pushes the branch if needed and creates the PR against the default branch. Add --reviewer, --label, or --draft as needed."
+    tags:
+      - ghcli
+      - pull-request
+
+  - id: infra-ghcli-004
+    type: basic
+    front: "How do you monitor a GitHub Actions workflow run and fail a script if the run fails?"
+    back: "Use `gh run watch RUN_ID --exit-status`. It streams live logs and exits with a non-zero code if the workflow fails. Use `gh run list` first to find the run ID."
+    tags:
+      - ghcli
+      - actions
+      - ci-cd
+
+  - id: infra-ghcli-005
+    type: basic
+    front: "How do you set a repository secret using GitHub CLI?"
+    back: "Run `gh secret set SECRET_NAME` and paste the value interactively, or pipe it: `echo 'value' | gh secret set SECRET_NAME`. Add `--env production` for environment-scoped secrets."
+    tags:
+      - ghcli
+      - secrets
+
+  # --- CLOZE (3) ---
+  - id: infra-ghcli-006
+    type: cloze
+    text: "To manually trigger a workflow with workflow_dispatch, use {{c1::gh workflow run}} followed by the workflow filename. You can pass inputs with {{c2::-f key=value}} flags."
+    tags:
+      - ghcli
+      - actions
+
+  - id: infra-ghcli-007
+    type: cloze
+    text: "The command `gh api` lets you make direct {{c1::REST or GraphQL}} calls to the GitHub API. Combine it with {{c2::jq}} for filtering JSON output in shell scripts."
+    tags:
+      - ghcli
+      - api
+
+  - id: infra-ghcli-008
+    type: cloze
+    text: "To create a GitHub release with assets, use `gh release create {{c1::TAG_NAME}}` and add binary files as arguments. Releases are {{c2::tag-based}}, so the tag must exist or will be created."
+    tags:
+      - ghcli
+      - releases
+
+  # --- VOCAB (2) ---
+  - id: infra-ghcli-009
+    type: vocab
+    term_pt: "despacho de fluxo de trabalho"
+    term_en: "workflow dispatch"
+    definition: "A GitHub Actions trigger that allows manual or API-initiated execution of a workflow, optionally accepting input parameters."
+    usage: "We added workflow_dispatch to our deploy workflow so we can trigger deployments manually via gh workflow run."
+    tags:
+      - ghcli
+      - actions
+
+  - id: infra-ghcli-010
+    type: vocab
+    term_pt: "extensao de CLI"
+    term_en: "CLI extension"
+    definition: "A community-built plugin that adds custom commands to GitHub CLI, installed via `gh extension install` from any repository."
+    usage: "We installed the gh-dash extension to get a terminal dashboard showing all our PRs and issues across repos."
+    tags:
+      - ghcli
+      - extensions
+
+  # --- SCENARIO (2) ---
+  - id: infra-ghcli-011
+    type: scenario
+    situation: "You need to check out a teammate's PR locally for testing, but you only know the PR number."
+    question: "What gh command do you use?"
+    answer: "Run `gh pr checkout PR_NUMBER`. It fetches the branch, creates a local tracking branch, and switches to it. Use `gh pr view PR_NUMBER` first to see the PR details and diff stats."
+    tags:
+      - ghcli
+      - pull-request
+      - code-review
+
+  - id: infra-ghcli-012
+    type: scenario
+    situation: "Your CI pipeline needs to create an issue automatically when a nightly build fails, with specific labels."
+    question: "How do you script this with gh?"
+    answer: "Run `gh issue create --title 'Nightly build failed' --body 'Details...' --label bug,ci --assignee @me`. Use GH_TOKEN env var for auth. Wrap in a conditional after `gh run watch --exit-status` fails."
+    tags:
+      - ghcli
+      - issues
+      - ci-cd
+
+  # --- PITFALL (3) ---
+  - id: infra-ghcli-013
+    type: pitfall
+    trap: "Hardcoding a personal access token in CI scripts instead of using GH_TOKEN or GITHUB_TOKEN."
+    why: "Hardcoded tokens get committed to repos, leak in logs, and don't rotate automatically. GITHUB_TOKEN in Actions is scoped per-job and expires automatically."
+    prevention: "Use `gh secret set` for custom tokens and reference via ${{ secrets.NAME }}. Prefer the built-in GITHUB_TOKEN for Actions workflows."
+    tags:
+      - ghcli
+      - security
+      - ci-cd
+
+  - id: infra-ghcli-014
+    type: pitfall
+    trap: "Using `gh repo create` with --template but forgetting it creates a shallow copy without git history."
+    why: "Template repos generate a new repo with a single initial commit. All original commit history, branches, and tags are lost — it's not a fork."
+    prevention: "Use --template only for boilerplate scaffolding. If you need history, fork the repo instead with `gh repo fork`."
+    tags:
+      - ghcli
+      - repository
+
+  - id: infra-ghcli-015
+    type: pitfall
+    trap: "Running `gh pr merge` without specifying merge strategy, getting unexpected merge commits."
+    why: "The default merge strategy depends on repo settings. Without explicit choice, you may get a merge commit when you wanted squash or rebase, polluting the commit history."
+    prevention: "Always specify: `gh pr merge --squash`, `--rebase`, or `--merge`. Check repo settings with `gh api repos/{owner}/{repo}` to see allowed strategies."
+    tags:
+      - ghcli
+      - pull-request

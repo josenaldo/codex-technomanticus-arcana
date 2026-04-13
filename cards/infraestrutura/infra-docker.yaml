@@ -1,0 +1,122 @@
+source: "Infraestrutura/Docker.md"
+source_hash: "4b24b3aa66a8"
+deck: "Codex::Infraestrutura"
+generated: "2026-04-13"
+tags:
+  - infraestrutura
+  - entrevista
+
+cards:
+  - id: infra-docker-001
+    type: basic
+    front: "Qual a diferença fundamental entre container e VM?"
+    back: |
+      Container compartilha o kernel do host usando namespaces
+      (isolamento) e cgroups (limites de recursos). VM virtualiza
+      hardware completo com SO próprio. Containers: MB e segundos.
+      VMs: GB e minutos.
+    tags: [docker, containers, conceitos]
+
+  - id: infra-docker-002
+    type: basic
+    front: "Qual a arquitetura do Docker do client até o container?"
+    back: |
+      Docker Client (CLI) → Docker Daemon (dockerd) →
+      containerd (gerencia ciclo de vida) → runc (cria o container
+      via syscalls do kernel). Registry armazena as imagens.
+    tags: [docker, arquitetura]
+
+  - id: infra-docker-003
+    type: basic
+    front: "Como funcionam as camadas (layers) de uma imagem Docker?"
+    back: |
+      Cada instrução no Dockerfile cria uma camada imutável
+      e read-only. Camadas são deduplicadas e cacheadas.
+      O container adiciona uma camada writable no topo (copy-on-write).
+    tags: [docker, imagens, layers]
+
+  - id: infra-docker-004
+    type: basic
+    front: "Por que usar ENTRYPOINT na forma exec em vez de shell form?"
+    back: |
+      Exec form (["app"]) roda o processo como PID 1, recebendo
+      sinais diretamente (SIGTERM para graceful shutdown).
+      Shell form (/bin/sh -c app) intercepta sinais, impedindo
+      shutdown limpo.
+    tags: [docker, dockerfile, sinais]
+
+  - id: infra-docker-005
+    type: basic
+    front: "Qual a diferença entre bind mount e named volume no Docker?"
+    back: |
+      Bind mount mapeia um diretório do host — bom para dev
+      (hot reload). Named volume é gerenciado pelo Docker,
+      persistente e portável — ideal para dados de produção
+      (ex: banco de dados).
+    tags: [docker, volumes]
+
+  - id: infra-docker-006
+    type: cloze
+    text: "Containers usam {{c1::namespaces}} para isolamento de processos, rede e filesystem, e {{c2::cgroups}} para limitar CPU, memória e I/O."
+    tags: [docker, containers, kernel]
+
+  - id: infra-docker-007
+    type: cloze
+    text: "No Dockerfile, colocar {{c1::COPY package*.json}} antes de COPY do código aproveita o cache de layers, evitando reinstalar dependências a cada build."
+    tags: [docker, dockerfile, cache]
+
+  - id: infra-docker-008
+    type: cloze
+    text: "Multi-stage build usa múltiplos {{c1::FROM}} no Dockerfile, copiando apenas artefatos finais para a imagem de produção, reduzindo tamanho drasticamente."
+    tags: [docker, dockerfile, otimizacao]
+
+  - id: infra-docker-009
+    type: vocab
+    term_pt: "Imagem distroless"
+    term_en: "Distroless image"
+    definition: "Imagem mínima sem shell, package manager ou utilitários do SO. Contém apenas a aplicação e suas dependências runtime."
+    usage: "Use distroless em produção para reduzir superfície de ataque e tamanho da imagem."
+    tags: [docker, seguranca, vocabulario]
+
+  - id: infra-docker-010
+    type: vocab
+    term_pt: "Digest de imagem"
+    term_en: "Image digest"
+    definition: "Hash SHA256 imutável que identifica uma imagem exata. Diferente de tags que podem ser sobrescritas."
+    usage: "Em produção, prefira digest (image@sha256:abc...) em vez de tags para garantir imutabilidade."
+    tags: [docker, imagens, vocabulario]
+
+  - id: infra-docker-011
+    type: scenario
+    situation: "Seu container Docker em produção ignora SIGTERM e leva 30s (timeout) para parar, sendo morto com SIGKILL."
+    question: "Qual a causa mais provável e como resolver?"
+    answer: "O processo não roda como PID 1 (shell form) ou não trata SIGTERM. Use ENTRYPOINT exec form e implemente handler de SIGTERM na aplicação."
+    tags: [docker, sinais, producao]
+
+  - id: infra-docker-012
+    type: scenario
+    situation: "Dois containers no mesmo docker-compose não conseguem se comunicar por hostname."
+    question: "O que verificar primeiro?"
+    answer: "Verificar se estão na mesma rede custom bridge. A rede bridge padrão não oferece DNS automático. Crie uma rede custom e coloque ambos nela."
+    tags: [docker, compose, redes]
+
+  - id: infra-docker-013
+    type: pitfall
+    trap: "Rodar container como root em produção"
+    why: "Se o container for comprometido, o atacante tem root no namespace, podendo escalar privilégios em configurações fracas do host."
+    prevention: "Adicione USER no Dockerfile com usuário não-root. Use imagens distroless ou alpine com usuário dedicado."
+    tags: [docker, seguranca, armadilhas]
+
+  - id: infra-docker-014
+    type: pitfall
+    trap: "Usar depends_on sem condition no docker-compose e assumir que o serviço está pronto"
+    why: "depends_on padrão espera apenas o container iniciar, não o serviço estar healthy. A aplicação pode falhar ao conectar."
+    prevention: "Use depends_on com condition: service_healthy e configure healthcheck no serviço dependido."
+    tags: [docker, compose, armadilhas]
+
+  - id: infra-docker-015
+    type: pitfall
+    trap: "Não usar .dockerignore e copiar node_modules, .git e arquivos sensíveis para a imagem"
+    why: "Imagem fica enorme, build lento, cache invalidado desnecessariamente, e secrets podem vazar na imagem."
+    prevention: "Crie .dockerignore com node_modules, .git, .env, *.log. Use secret mounts para dados sensíveis no build."
+    tags: [docker, seguranca, armadilhas]

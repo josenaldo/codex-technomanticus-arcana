@@ -1,0 +1,123 @@
+source: "Infraestrutura/Observabilidade.md"
+source_hash: "01d836b13e62"
+deck: "Codex::Infraestrutura"
+generated: "2026-04-13"
+tags:
+  - infraestrutura
+  - entrevista
+
+cards:
+  - id: infra-observability-001
+    type: basic
+    front: "Qual a diferença entre monitoramento e observabilidade?"
+    back: |
+      Monitoramento responde perguntas conhecidas (CPU > 80%?).
+      Observabilidade permite investigar perguntas desconhecidas
+      (por que esse request específico falhou?) através de dados
+      ricos: logs, métricas e traces correlacionados.
+    tags: [observabilidade, conceitos]
+
+  - id: infra-observability-002
+    type: basic
+    front: "Quais são os 3 pilares da observabilidade?"
+    back: |
+      Logs: eventos discretos (o que aconteceu).
+      Métricas: valores numéricos agregáveis ao longo do tempo (quanto).
+      Traces: fluxo de um request através de serviços distribuídos (onde/quando).
+    tags: [observabilidade, pilares]
+
+  - id: infra-observability-003
+    type: basic
+    front: "Qual a diferença entre os métodos RED e USE para métricas?"
+    back: |
+      RED (Rate, Errors, Duration) — para serviços/endpoints.
+      USE (Utilization, Saturation, Errors) — para recursos
+      de infraestrutura (CPU, memória, disco, rede).
+      RED foca na experiência do usuário, USE na saúde do sistema.
+    tags: [observabilidade, metricas, metodos]
+
+  - id: infra-observability-004
+    type: basic
+    front: "Qual a diferença entre SLI, SLO, SLA e error budget?"
+    back: |
+      SLI: métrica que mede o serviço (ex: latência p99).
+      SLO: objetivo interno (p99 < 200ms).
+      SLA: contrato com cliente, com penalidades.
+      Error budget: margem de falha permitida pelo SLO (100% - SLO).
+    tags: [observabilidade, sre, metricas]
+
+  - id: infra-observability-005
+    type: basic
+    front: "Por que usar logs estruturados (JSON) em vez de texto livre?"
+    back: |
+      JSON é parseável por máquinas, permite filtros, agregações
+      e correlação automática. Texto livre exige regex frágil.
+      Campos padronizados (trace_id, level, service) habilitam
+      queries eficientes em Loki/ELK.
+    tags: [observabilidade, logs]
+
+  - id: infra-observability-006
+    type: cloze
+    text: "Os 3 pilares da observabilidade se correlacionam via {{c1::trace_id}}, permitindo navegar de um log de erro para o trace completo do request."
+    tags: [observabilidade, correlacao]
+
+  - id: infra-observability-007
+    type: cloze
+    text: "Prometheus oferece 4 tipos de métricas: {{c1::counter}} (só sobe), gauge (sobe/desce), {{c2::histogram}} (distribuição em buckets) e summary."
+    tags: [observabilidade, prometheus, metricas]
+
+  - id: infra-observability-008
+    type: cloze
+    text: "Alertas devem ser baseados em {{c1::sintomas}} (latência alta, erros 5xx) e não em causas (CPU alta), e cada alerta deve ter um {{c2::runbook}} associado."
+    tags: [observabilidade, alertas]
+
+  - id: infra-observability-009
+    type: vocab
+    term_pt: "Cardinalidade (de métricas)"
+    term_en: "Cardinality"
+    definition: "Quantidade de combinações únicas de labels em uma métrica. Alta cardinalidade (ex: user_id como label) explode memória e storage do Prometheus."
+    usage: "Evite labels com valores ilimitados. Use histograms em vez de métricas por usuário. Cardinalidade mata Prometheus."
+    tags: [observabilidade, prometheus, vocabulario]
+
+  - id: infra-observability-010
+    type: vocab
+    term_pt: "Amostragem (de traces)"
+    term_en: "Sampling"
+    definition: "Coletar apenas uma fração dos traces para reduzir custo. Head sampling decide no início; tail sampling decide após o trace completar."
+    usage: "Tail sampling retém traces com erro ou alta latência. Mais útil que head sampling, porém mais complexo de implementar."
+    tags: [observabilidade, tracing, vocabulario]
+
+  - id: infra-observability-011
+    type: scenario
+    situation: "Usuários reportam lentidão intermitente, mas métricas de CPU e memória dos serviços estão normais."
+    question: "Como investigar com observabilidade?"
+    answer: "Use traces distribuídos para identificar qual serviço/span está lento. Filtre por p99 de latência. Correlacione trace_id com logs para ver o contexto exato da lentidão."
+    tags: [observabilidade, tracing, troubleshooting]
+
+  - id: infra-observability-012
+    type: scenario
+    situation: "Sua fatura de observabilidade triplicou nos últimos 3 meses."
+    question: "Quais estratégias para controlar custos?"
+    answer: "Implementar tail sampling em traces. Reduzir cardinalidade de métricas. Definir tiers de retenção (hot/warm/cold). Filtrar logs de debug em produção."
+    tags: [observabilidade, custos, otimizacao]
+
+  - id: infra-observability-013
+    type: pitfall
+    trap: "Usar histogram_quantile sem entender os buckets padrão do Prometheus"
+    why: "Buckets padrão podem não cobrir sua faixa de latência. Percentis calculados interpolam entre buckets — poucos buckets geram resultados imprecisos."
+    prevention: "Configure buckets customizados baseados no perfil real de latência do serviço. Prefira histogram sobre summary."
+    tags: [observabilidade, prometheus, armadilhas]
+
+  - id: infra-observability-014
+    type: pitfall
+    trap: "Logar dados sensíveis (tokens, senhas, PII) em logs estruturados"
+    why: "Logs geralmente têm retenção longa e acesso amplo. Dados sensíveis em logs violam LGPD/GDPR e são vetor de vazamento."
+    prevention: "Defina política de o-que-logar. Mascare PII automaticamente. Nunca logue headers de autenticação ou bodies com dados pessoais."
+    tags: [observabilidade, seguranca, armadilhas]
+
+  - id: infra-observability-015
+    type: pitfall
+    trap: "Criar alertas para cada métrica sem critério, gerando alert fatigue"
+    why: "Excesso de alertas dessensibiliza a equipe. Alertas ignorados levam a incidentes reais não tratados."
+    prevention: "Alerte apenas sintomas impactando usuário. Cada alerta deve ser acionável com runbook. Revise e elimine alertas ruidosos."
+    tags: [observabilidade, alertas, armadilhas]

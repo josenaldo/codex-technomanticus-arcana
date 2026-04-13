@@ -1,0 +1,123 @@
+source: "Infraestrutura/CI-CD.md"
+source_hash: "729cad28cee9"
+deck: "Codex::Infraestrutura"
+generated: "2026-04-13"
+tags:
+  - infraestrutura
+  - entrevista
+
+cards:
+  - id: infra-cicd-001
+    type: basic
+    front: "Qual a diferença entre Continuous Integration, Continuous Delivery e Continuous Deployment?"
+    back: |
+      CI: merge e build/test automatizados a cada commit.
+      Delivery: artefato sempre pronto para deploy, mas release manual.
+      Deployment: deploy automático em produção após pipeline verde.
+    tags: [cicd, conceitos]
+
+  - id: infra-cicd-002
+    type: basic
+    front: "Quais são as 4 métricas DORA e o que medem?"
+    back: |
+      1. Deploy Frequency — frequência de deploys em produção
+      2. Lead Time for Changes — commit até produção
+      3. MTTR — tempo para restaurar o serviço após falha
+      4. Change Failure Rate — % de deploys que causam incidente
+    tags: [cicd, dora, metricas]
+
+  - id: infra-cicd-003
+    type: basic
+    front: "Por que trunk-based development é preferido sobre GitFlow para CI/CD?"
+    back: |
+      Branches curtas (< 1 dia) reduzem conflitos de merge e
+      permitem CI real. GitFlow usa branches longas que divergem,
+      atrasam integração e geram merges dolorosos.
+      Feature flags substituem branches de feature.
+    tags: [cicd, gitflow, trunkbased]
+
+  - id: infra-cicd-004
+    type: basic
+    front: "Qual a hierarquia de conceitos no GitHub Actions?"
+    back: |
+      Workflow (arquivo YAML, disparado por trigger) →
+      Job (roda em runner, paralelo por padrão) →
+      Step (sequencial dentro do job) → Action (unidade reutilizável).
+      Runner é a máquina que executa.
+    tags: [cicd, githubactions]
+
+  - id: infra-cicd-005
+    type: basic
+    front: "Quais são as 3 principais estratégias de deployment e quando usar cada uma?"
+    back: |
+      Rolling update: gradual, sem infra extra, rollback lento.
+      Blue-green: duas versões completas, rollback instantâneo.
+      Canary: % pequeno recebe versão nova, valida antes
+      de expandir. Feature flags separam deploy de release.
+    tags: [cicd, deployment, estrategias]
+
+  - id: infra-cicd-006
+    type: cloze
+    text: "Em trunk-based development, branches devem durar {{c1::menos de um dia}} e o código incompleto em produção é controlado via {{c2::feature flags}}."
+    tags: [cicd, trunkbased]
+
+  - id: infra-cicd-007
+    type: cloze
+    text: "GitOps usa {{c1::Git como fonte de verdade}} para infraestrutura, e ferramentas como ArgoCD fazem {{c2::self-healing}} ao detectar drift entre o cluster e o repositório."
+    tags: [cicd, gitops]
+
+  - id: infra-cicd-008
+    type: cloze
+    text: "OIDC no GitHub Actions permite {{c1::autenticação keyless}} com cloud providers, eliminando a necessidade de armazenar {{c2::credenciais de longa duração}} como secrets."
+    tags: [cicd, githubactions, seguranca]
+
+  - id: infra-cicd-009
+    type: vocab
+    term_pt: "SAST (Análise estática)"
+    term_en: "SAST (Static Application Security Testing)"
+    definition: "Análise de segurança do código-fonte sem executá-lo. Encontra vulnerabilidades no código antes do deploy."
+    usage: "Integre SAST (CodeQL, Semgrep) no pipeline de CI para detectar vulnerabilidades cedo, antes do merge."
+    tags: [cicd, seguranca, vocabulario]
+
+  - id: infra-cicd-010
+    type: vocab
+    term_pt: "IaC (Infraestrutura como Código)"
+    term_en: "IaC (Infrastructure as Code)"
+    definition: "Gerenciar infraestrutura via arquivos declarativos versionados, não cliques manuais. Terraform, Pulumi e CloudFormation são exemplos."
+    usage: "Use terraform plan para preview e terraform apply para aplicar. Armazene state remotamente (S3, Terraform Cloud)."
+    tags: [cicd, iac, vocabulario]
+
+  - id: infra-cicd-011
+    type: scenario
+    situation: "Seu pipeline de CI leva 45 minutos para completar. Desenvolvedores reclamam do feedback lento."
+    question: "Como otimizar?"
+    answer: "Fail fast: testes unitários e lint primeiro. Paralelizar jobs independentes. Usar cache de dependências. Matrix builds para testes. Meta: pipeline total < 30 minutos."
+    tags: [cicd, otimizacao, pipeline]
+
+  - id: infra-cicd-012
+    type: scenario
+    situation: "Após um deploy canary de 5%, métricas de erro sobem de 0.1% para 2% nesse grupo."
+    question: "Qual a ação correta?"
+    answer: "Rollback automático do canary. Analisar logs e métricas do grupo afetado. Corrigir o bug, passar pelo pipeline completo e tentar novo canary."
+    tags: [cicd, canary, deployment]
+
+  - id: infra-cicd-013
+    type: pitfall
+    trap: "Armazenar secrets diretamente no repositório Git, mesmo em repos privados"
+    why: "Histórico do Git é permanente. Secrets vazados exigem rotação imediata. Ferramentas como gitleaks encontram facilmente."
+    prevention: "Use secrets manager (Vault, GitHub Secrets). Adicione gitleaks como pre-commit hook. Nunca commite .env."
+    tags: [cicd, seguranca, armadilhas]
+
+  - id: infra-cicd-014
+    type: pitfall
+    trap: "Depender apenas de testes unitários no pipeline de CI"
+    why: "Testes unitários não pegam problemas de integração, vulnerabilidades de segurança ou regressões visuais."
+    prevention: "Pipeline completo: SAST, SCA (Dependabot/Trivy), testes de integração, e DAST (ZAP) em staging."
+    tags: [cicd, testes, armadilhas]
+
+  - id: infra-cicd-015
+    type: pitfall
+    trap: "Usar GitFlow com branches de feature de semanas para CI/CD"
+    why: "Branches longas divergem do trunk, gerando merge hell e impedindo integração contínua real. CI vira integration tardia."
+    prevention: "Adote trunk-based dev com branches < 1 dia. Use feature flags para código incompleto em produção."
+    tags: [cicd, gitflow, armadilhas]
