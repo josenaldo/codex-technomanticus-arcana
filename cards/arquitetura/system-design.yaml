@@ -1,0 +1,146 @@
+source: "Arquitetura/System Design.md"
+source_hash: "077013e82637"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: arq-systemdesign-001
+    type: basic
+    front: "What are the 6 phases of a System Design interview framework?"
+    back: "1) Clarify requirements (5 min), 2) Back-of-envelope estimates (5 min), 3) API design (5 min), 4) High-level diagram (10 min), 5) Deep dive on 2-3 components (15-20 min), 6) Trade-offs and evolution (5 min)."
+    tags:
+      - system-design
+      - interview-framework
+
+  - id: arq-systemdesign-002
+    type: basic
+    front: "What is the CAP Theorem and what does choosing CP vs AP mean in practice?"
+    back: "In a distributed system with network partitions (P is inevitable): CP = strong consistency, accepts unavailability during partitions (e.g. ZooKeeper). AP = always available, accepts temporary inconsistency (e.g. Cassandra). Financial ops need CP; feeds/likes tolerate AP."
+    tags:
+      - system-design
+      - cap-theorem
+
+  - id: arq-systemdesign-003
+    type: basic
+    front: "What is consistent hashing and why is it useful for sharding?"
+    back: "A hash ring where servers occupy arcs. Data maps to the ring and goes to the next server clockwise. Adding/removing a server only redistributes minimal data (not everything). Used by Cassandra, DynamoDB, memcached."
+    tags:
+      - system-design
+      - sharding
+
+  - id: arq-systemdesign-004
+    type: basic
+    front: "In a URL shortener design, why choose 302 redirect over 301?"
+    back: "301 (Moved Permanently) makes browsers cache the redirect, reducing server load but losing analytics. 302 (Found) means every request hits the server, enabling click tracking and analytics. Choose 302 when analytics matter."
+    tags:
+      - system-design
+      - url-shortener
+
+  - id: arq-systemdesign-005
+    type: basic
+    front: "What is the Circuit Breaker pattern and what are its three states?"
+    back: "Stops calling a failing downstream service to prevent cascade failures. States: CLOSED (normal, tracking failures) -> OPEN (rejects all calls after threshold) -> HALF-OPEN (tests one call after cooldown; success returns to CLOSED, failure returns to OPEN)."
+    tags:
+      - system-design
+      - circuit-breaker
+
+  # --- CLOZE (3) ---
+  - id: arq-systemdesign-006
+    type: cloze
+    text: "The cache-aside (lazy loading) strategy works as: app checks cache -> {{c1::on miss, reads from DB}} -> populates cache. The write-through strategy writes to {{c2::both cache and DB simultaneously}}, ensuring strong consistency but slower writes."
+    tags:
+      - system-design
+      - caching
+
+  - id: arq-systemdesign-007
+    type: cloze
+    text: "For a News Feed, {{c1::fan-out on write (push)}} pre-computes the timeline for each follower at post time, giving fast reads. For celebrities with millions of followers, use {{c2::fan-out on read (pull)}} and merge at read time. Most production systems use a hybrid."
+    tags:
+      - system-design
+      - news-feed
+
+  - id: arq-systemdesign-008
+    type: cloze
+    text: "In a chat system, {{c1::Snowflake IDs}} provide distributed, ordered, unique message identifiers. For presence (online/offline), clients send {{c2::heartbeats}} every 30 seconds; absence for 90 seconds marks the user offline."
+    tags:
+      - system-design
+      - chat-system
+
+  # --- VOCAB (2) ---
+  - id: arq-systemdesign-009
+    type: vocab
+    term_pt: "estimativa de envelope"
+    term_en: "back-of-envelope estimation"
+    definition: "Quick approximate calculations to determine system scale requirements (QPS, storage, bandwidth) using rough numbers. Justifies architectural decisions with data, not intuition."
+    usage: "Back-of-envelope math shows 100M URLs/day means ~1200 writes/s and ~120K reads/s, confirming we need caching and horizontal scaling."
+    tags:
+      - system-design
+      - estimation
+      - vocabulario
+
+  - id: arq-systemdesign-010
+    type: vocab
+    term_pt: "janela deslizante"
+    term_en: "sliding window counter"
+    definition: "A rate limiting algorithm that combines fixed window counts with proportional weighting from the previous window. Balances memory efficiency with precision."
+    usage: "We implemented a sliding window counter in Redis for our API rate limiter — better precision than fixed window without the memory cost of logging every timestamp."
+    tags:
+      - system-design
+      - rate-limiting
+      - vocabulario
+
+  # --- SCENARIO (2) ---
+  - id: arq-systemdesign-011
+    type: scenario
+    situation: "You're designing a URL shortener that needs to handle 100M new URLs per day with a 100:1 read-to-write ratio."
+    question: "How do you generate short codes without collisions in a distributed system?"
+    answer: "Use a distributed counter (Redis INCR or ZooKeeper) + Base62 encoding. Each server pre-fetches a range of IDs (e.g. 1M at a time) and generates locally. No per-request coordination, no collisions, no hash truncation issues."
+    tags:
+      - system-design
+      - url-shortener
+      - scenario
+
+  - id: arq-systemdesign-012
+    type: scenario
+    situation: "Your rate limiter uses Redis, but Redis becomes temporarily unavailable."
+    question: "Should you fail-open (allow all requests) or fail-closed (block all requests)?"
+    answer: "Fail-open is safer for most systems. Blocking all traffic during a Redis outage creates a full service outage from a non-critical component. Accept temporarily unthrottled traffic rather than total unavailability. Log the gap for auditing."
+    tags:
+      - system-design
+      - rate-limiting
+      - scenario
+
+  # --- PITFALL (3) ---
+  - id: arq-systemdesign-013
+    type: pitfall
+    trap: "Jumping straight into architecture without clarifying requirements in a System Design interview."
+    why: "Without knowing scale, latency targets, and consistency needs, you'll over-engineer or under-engineer. Two 'chat systems' can need completely different architectures depending on requirements."
+    prevention: "Spend the first 5 minutes asking: DAU count, read/write ratio, latency SLA, consistency needs, data retention, global vs regional. These answers drive every subsequent decision."
+    tags:
+      - system-design
+      - interview
+      - pitfall
+
+  - id: arq-systemdesign-014
+    type: pitfall
+    trap: "Using cache-aside without a plan for cache invalidation."
+    why: "Stale data accumulates silently. TTL alone may serve expired data for minutes. Event-based invalidation is consistent but complex. Without a strategy, caching creates subtle correctness bugs."
+    prevention: "Choose an invalidation strategy upfront: TTL for tolerance of staleness, event-based for consistency, or versioned keys. Document the staleness window your system accepts."
+    tags:
+      - system-design
+      - caching
+      - pitfall
+
+  - id: arq-systemdesign-015
+    type: pitfall
+    trap: "Choosing hash-based sharding and then needing range queries."
+    why: "Hash sharding distributes data uniformly but destroys key ordering. Range queries (e.g. 'all orders from March') must scatter-gather across all shards, negating performance benefits."
+    prevention: "If range queries are a core use case, use range-based sharding or a composite approach. For uniform distribution without range needs, hash sharding is fine. Choose the shard key based on access patterns."
+    tags:
+      - system-design
+      - sharding
+      - pitfall

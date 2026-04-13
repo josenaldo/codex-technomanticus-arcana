@@ -1,0 +1,146 @@
+source: "Arquitetura/Event Storming/Event Storming.md"
+source_hash: "35240b0405e8"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: arq-eventstorming-001
+    type: basic
+    front: "What are the three levels of Event Storming and their purposes?"
+    back: "Big Picture: high-level domain mapping, discover bounded contexts. Process Modelling: detail a specific process with actors, commands, policies. Software Design: bridge to implementation, identify aggregates and invariants."
+    tags:
+      - event-storming
+      - ddd
+
+  - id: arq-eventstorming-002
+    type: basic
+    front: "What do the post-it colors mean in Event Storming?"
+    back: "Orange = domain event (past tense), blue = command (imperative), yellow = actor, green = read model, lilac/purple = policy (when X then Y), pink = external system, red = hot spot (problem/question)."
+    tags:
+      - event-storming
+      - post-it-colors
+
+  - id: arq-eventstorming-003
+    type: basic
+    front: "What is a 'hot spot' in Event Storming and why are they valuable?"
+    back: "Red/pink post-its marking areas of confusion, disagreement, or unknown rules. Brandolini says hot spots are 'gold' because they reveal where the most learning and discovery happens. Never hide or remove them."
+    tags:
+      - event-storming
+      - hot-spots
+
+  - id: arq-eventstorming-004
+    type: basic
+    front: "What is the Chaotic Exploration phase in Big Picture Event Storming?"
+    back: "The first phase where everyone writes domain events on orange post-its in parallel, without discussion or filtering. 20-30 minutes of creative chaos. Events are placed roughly in chronological order on the wall."
+    tags:
+      - event-storming
+      - facilitation
+
+  - id: arq-eventstorming-005
+    type: basic
+    front: "How does Event Storming connect to discovering Bounded Contexts?"
+    back: "In Big Picture, natural groupings of events become bounded context candidates. When a concept changes meaning between areas (e.g. 'customer' in Payments vs 'patient' in Scheduling), that signals a context boundary."
+    tags:
+      - event-storming
+      - ddd
+      - bounded-context
+
+  # --- CLOZE (3) ---
+  - id: arq-eventstorming-006
+    type: cloze
+    text: "Domain events in Event Storming are always written in {{c1::past tense}} (e.g. 'Order Confirmed', not 'Confirm Order'). Commands are written in {{c2::imperative}} form (e.g. 'Confirm Order')."
+    tags:
+      - event-storming
+      - naming
+
+  - id: arq-eventstorming-007
+    type: cloze
+    text: "A {{c1::pivotal event}} is one that changes the nature of what happens next — e.g. 'Order Paid' triggers fulfillment and billing. Mark them with a {{c2::vertical line}} on the wall to separate phases."
+    tags:
+      - event-storming
+      - pivotal-events
+
+  - id: arq-eventstorming-008
+    type: cloze
+    text: "The flow structure in Process Modelling is: Actor -> {{c1::Command}} -> Event -> {{c2::Policy}} -> Command -> Event, where policies are automatic rules that trigger follow-up actions."
+    tags:
+      - event-storming
+      - process-modelling
+
+  # --- VOCAB (2) ---
+  - id: arq-eventstorming-009
+    type: vocab
+    term_pt: "evento de dominio"
+    term_en: "domain event"
+    definition: "A significant business fact that happened, written in past tense on an orange post-it. Represents something meaningful to domain experts, not technical implementation."
+    usage: "We identified 'Payment Approved' as a pivotal domain event that triggers inventory reservation and notification workflows."
+    tags:
+      - event-storming
+      - ddd
+      - vocabulario
+
+  - id: arq-eventstorming-010
+    type: vocab
+    term_pt: "ponto quente"
+    term_en: "hot spot"
+    definition: "A red/pink post-it marking confusion, disagreement, unknown rules, or risk discovered during the workshop. Indicates where learning is needed most."
+    usage: "The hot spot 'What happens if the doctor cancels after payment?' revealed a refund flow nobody had documented."
+    tags:
+      - event-storming
+      - vocabulario
+
+  # --- SCENARIO (2) ---
+  - id: arq-eventstorming-011
+    type: scenario
+    situation: "Your team plans to break a legacy EJB monolith into microservices. Documentation says there are 3 main workflows."
+    question: "How would you use Event Storming to guide the migration?"
+    answer: "Run a Big Picture Event Storming with domain experts. Map all events chronologically — you'll likely discover more workflows than documented. Group events into bounded context candidates. These become your microservice boundaries."
+    tags:
+      - event-storming
+      - migration
+      - scenario
+
+  - id: arq-eventstorming-012
+    type: scenario
+    situation: "During an Event Storming workshop, a developer writes 'Cache Invalidated' and 'Request Received' as events on the wall."
+    question: "What's wrong with these events and how should the facilitator correct it?"
+    answer: "These are technical/implementation events, not business domain events. Event Storming focuses on business behavior. Redirect to: 'What business fact happened?' Examples: 'Order Placed', 'Payment Confirmed' — facts meaningful to domain experts."
+    tags:
+      - event-storming
+      - facilitation
+      - scenario
+
+  # --- PITFALL (3) ---
+  - id: arq-eventstorming-013
+    type: pitfall
+    trap: "Running an Event Storming workshop without domain experts in the room."
+    why: "Without people who know how the business actually works, the workshop becomes invention, not discovery. Developers guess at rules and flows, producing an inaccurate model."
+    prevention: "Ensure domain experts (not just managers) attend. They are the people who handle the actual processes daily. Cancel or postpone if they can't attend."
+    tags:
+      - event-storming
+      - facilitation
+      - pitfall
+
+  - id: arq-eventstorming-014
+    type: pitfall
+    trap: "Discussing technology choices ('Should we use Kafka?', 'Will this be a microservice?') during a Big Picture Event Storming."
+    why: "Big Picture is about understanding the business domain, not implementation. Technology discussions derail discovery, bias the model, and alienate non-technical participants."
+    prevention: "The facilitator must redirect: 'Let's capture the business flow first, we'll discuss technology in Software Design level.' Keep focus on events and processes."
+    tags:
+      - event-storming
+      - facilitation
+      - pitfall
+
+  - id: arq-eventstorming-015
+    type: pitfall
+    trap: "Skipping Big Picture and jumping directly to Software Design Event Storming."
+    why: "Without understanding the whole domain first, you model in a vacuum. You miss bounded context boundaries, pivotal events, and cross-cutting concerns. The detailed model may be correct locally but wrong globally."
+    prevention: "Always start with Big Picture to map the domain. Then zoom into specific processes with Process Modelling. Software Design comes last, informed by the big picture."
+    tags:
+      - event-storming
+      - facilitation
+      - pitfall

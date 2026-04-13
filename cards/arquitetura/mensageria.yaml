@@ -1,0 +1,148 @@
+source: "Arquitetura/Mensageria/Mensageria.md"
+source_hash: "307128e873df"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+
+  - id: arq-mensageria-001
+    type: basic
+    front: "What is the fundamental difference between a Message Queue and Event Streaming?"
+    back: "Message Queue: message is a task, consumed and removed, one consumer per message. Event Streaming: event is an immutable fact, persisted in a log, multiple consumers read independently via offsets, supports replay."
+    tags:
+      - mensageria
+      - conceitos
+
+  - id: arq-mensageria-002
+    type: basic
+    front: "What are the three delivery semantics in messaging and which is the practical default?"
+    back: "At-most-once (may lose, never duplicate), at-least-once (never lose, may duplicate), exactly-once (neither). Practical default: at-least-once with idempotent consumers."
+    tags:
+      - mensageria
+      - delivery-semantics
+
+  - id: arq-mensageria-003
+    type: basic
+    front: "What is the Outbox Pattern and why is it needed?"
+    back: "Guarantees atomicity between a database write and message publication. Both are written in the same DB transaction; a separate process reads the outbox table and publishes to the broker. Prevents silent inconsistency when the broker is down."
+    tags:
+      - mensageria
+      - outbox-pattern
+
+  - id: arq-mensageria-004
+    type: basic
+    front: "What is the purpose of a Dead Letter Queue (DLQ)?"
+    back: "A special queue for messages that failed after N retries. Prevents poison messages from blocking processing. Should trigger alerts, include error metadata, and allow manual replay after the bug is fixed."
+    tags:
+      - mensageria
+      - dlq
+
+  - id: arq-mensageria-005
+    type: basic
+    front: "When should you prefer synchronous communication (HTTP) over asynchronous messaging?"
+    back: "When the response is needed to continue (e.g., login validation), latency must be low, the operation is fast and idempotent, or immediate error feedback is required. Default to sync; switch to async when there's concrete pain."
+    tags:
+      - mensageria
+      - design-decisions
+
+  # === CLOZE (3) ===
+
+  - id: arq-mensageria-006
+    type: cloze
+    text: "In messaging, {{c1::at-least-once}} delivery is the practical default because it never loses messages, but requires {{c2::idempotent consumers}} to handle duplicates."
+    tags:
+      - mensageria
+      - delivery-semantics
+
+  - id: arq-mensageria-007
+    type: cloze
+    text: "Exponential backoff with {{c1::jitter}} prevents {{c2::thundering herd}} when many consumers retry simultaneously after a downstream failure."
+    tags:
+      - mensageria
+      - retry
+
+  - id: arq-mensageria-008
+    type: cloze
+    text: "The Outbox Pattern uses {{c1::CDC (Change Data Capture)}} or polling to read a database outbox table and publish events, guaranteeing {{c2::at-least-once}} delivery."
+    tags:
+      - mensageria
+      - outbox-pattern
+
+  # === VOCAB (2) ===
+
+  - id: arq-mensageria-009
+    type: vocab
+    term_pt: "fila de mensagens mortas"
+    term_en: "dead letter queue (DLQ)"
+    definition: "Special queue that receives messages that failed processing after maximum retries, preventing them from blocking the main queue."
+    usage: "Every queue in production needs a DLQ. Poison messages will happen."
+    tags:
+      - mensageria
+      - vocabulario
+
+  - id: arq-mensageria-010
+    type: vocab
+    term_pt: "mensagem venenosa"
+    term_en: "poison message"
+    definition: "A message that always fails processing, usually due to invalid payload or unhandled edge case."
+    usage: "Without a DLQ, a single poison message can block the entire queue forever."
+    tags:
+      - mensageria
+      - vocabulario
+
+  # === SCENARIO (2) ===
+
+  - id: arq-mensageria-011
+    type: scenario
+    situation: "Your order service saves to the database and publishes to Kafka, but sometimes the Kafka publish fails after the DB commit."
+    question: "How do you guarantee atomicity between the DB write and event publication?"
+    answer: "Use the Outbox Pattern: write both order and outbox event in the same DB transaction. A separate process (polling or Debezium CDC) reads the outbox and publishes to Kafka. Consumer must be idempotent."
+    tags:
+      - mensageria
+      - outbox-pattern
+      - scenario
+
+  - id: arq-mensageria-012
+    type: scenario
+    situation: "You need to choose a broker. The system has Node.js services, needs background job processing (emails, reports), and already uses Redis."
+    question: "Which broker do you recommend and why?"
+    answer: "BullMQ. It's a job queue built on Redis, perfect for Node.js background tasks. No new infrastructure needed. Use Kafka only if you need replay, event streaming, or multiple independent consumer groups."
+    tags:
+      - mensageria
+      - broker-selection
+      - scenario
+
+  # === PITFALL (3) ===
+
+  - id: arq-mensageria-013
+    type: pitfall
+    trap: "Using at-least-once delivery without making consumers idempotent."
+    why: "Duplicates are inevitable (retries, rebalances, crashes). Non-idempotent consumers cause silent bugs: duplicate emails, double charges, corrupted analytics."
+    prevention: "Use a processed_events dedup table, upserts instead of inserts, or naturally idempotent operations (SET status vs INCREMENT counter)."
+    tags:
+      - mensageria
+      - idempotencia
+
+  - id: arq-mensageria-014
+    type: pitfall
+    trap: "Infinite retry without a DLQ — poison messages loop forever."
+    why: "A permanently invalid message will never succeed. Without retry limits and DLQ, it blocks the queue, burns CPU, and lag grows indefinitely."
+    prevention: "Set max retries (3-5), use exponential backoff with jitter, route failures to DLQ after exhausting retries, and alert on DLQ items."
+    tags:
+      - mensageria
+      - retry
+      - dlq
+
+  - id: arq-mensageria-015
+    type: pitfall
+    trap: "Committing Kafka offset before processing the message."
+    why: "If the consumer dies mid-processing, the message is lost — offset was already advanced. Silent data loss."
+    prevention: "Always commit offset after successful processing. Use manual commit, not auto-commit, in production."
+    tags:
+      - mensageria
+      - kafka
+      - offset

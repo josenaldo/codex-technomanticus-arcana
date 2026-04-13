@@ -1,0 +1,151 @@
+source: "Arquitetura/Design Patterns.md"
+source_hash: "54c42ce918c0"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: arq-designpatterns-001
+    type: basic
+    front: "What are the three categories of GoF Design Patterns? Give one example of each."
+    back: "Creational (how objects are created) — e.g. Builder. Structural (how objects are composed) — e.g. Adapter. Behavioral (how objects interact) — e.g. Strategy."
+    tags:
+      - design-patterns
+      - gof
+
+  - id: arq-designpatterns-002
+    type: basic
+    front: "Why does @Transactional not work on private methods or internal calls (this.method()) in Spring?"
+    back: "Spring implements @Transactional via the Proxy pattern (CGLIB/JDK dynamic proxy). The proxy only intercepts external calls to the bean. Private methods and self-calls bypass the proxy, so the transaction never opens."
+    tags:
+      - design-patterns
+      - proxy
+      - spring
+
+  - id: arq-designpatterns-003
+    type: basic
+    front: "When should you use the Builder pattern?"
+    back: "When a constructor has 4+ parameters, many optional fields, you need immutable objects with complex construction, or construction requires validation steps. In Java, Lombok @Builder is the idiomatic shortcut."
+    tags:
+      - design-patterns
+      - builder
+
+  - id: arq-designpatterns-004
+    type: basic
+    front: "How does the Strategy pattern work idiomatically in Spring Boot?"
+    back: "Define an interface (e.g. DiscountStrategy), create multiple @Component implementations, and inject Map<String, DiscountStrategy>. Spring auto-populates the map with all beans keyed by name. Select the implementation at runtime by key."
+    tags:
+      - design-patterns
+      - strategy
+      - spring
+
+  - id: arq-designpatterns-005
+    type: basic
+    front: "What is the difference between Decorator and inheritance for adding behavior?"
+    back: "Decorator adds behavior at runtime by wrapping an object with the same interface. Multiple decorators can be stacked. Inheritance is static and compile-time. Decorator enables composable behavior without class explosion."
+    tags:
+      - design-patterns
+      - decorator
+
+  # --- CLOZE (3) ---
+  - id: arq-designpatterns-006
+    type: cloze
+    text: "The {{c1::Facade}} pattern provides a simplified interface to a complex subsystem. In Spring, almost every @Service that orchestrates multiple repositories and clients is a {{c2::Facade}}."
+    tags:
+      - design-patterns
+      - facade
+
+  - id: arq-designpatterns-007
+    type: cloze
+    text: "The {{c1::Observer}} pattern in Spring is implemented via @EventListener. The publisher calls ApplicationEventPublisher.publishEvent() and {{c2::subscribers are decoupled}} — they react without the publisher knowing about them."
+    tags:
+      - design-patterns
+      - observer
+      - spring
+
+  - id: arq-designpatterns-008
+    type: cloze
+    text: "The {{c1::Command}} pattern encapsulates a request as an object, enabling queuing, logging, and undo/redo. In architecture, it connects to {{c2::CQRS}} where Commands mutate state and Queries read it."
+    tags:
+      - design-patterns
+      - command
+      - cqrs
+
+  # --- VOCAB (2) ---
+  - id: arq-designpatterns-009
+    type: vocab
+    term_pt: "inversao de controle"
+    term_en: "inversion of control (IoC)"
+    definition: "Principle where objects don't create their dependencies — they are provided externally. The framework controls the lifecycle, not the application code."
+    usage: "Spring's IoC container manages bean creation and injection, so our services declare dependencies via constructors without instantiating them."
+    tags:
+      - design-patterns
+      - ioc
+      - vocabulario
+
+  - id: arq-designpatterns-010
+    type: vocab
+    term_pt: "abstracao prematura"
+    term_en: "premature abstraction"
+    definition: "Creating interfaces, factories, or patterns for hypothetical future needs that never materialize. Adds complexity without benefit."
+    usage: "I created an EmailTemplateStrategy interface with one implementation that stayed alone for three years — classic premature abstraction."
+    tags:
+      - design-patterns
+      - anti-pattern
+      - vocabulario
+
+  # --- SCENARIO (2) ---
+  - id: arq-designpatterns-011
+    type: scenario
+    situation: "A checkout service directly calls CartService, InventoryService, PaymentGateway, OrderRepository, and NotificationService. The controller has 50 lines of orchestration."
+    question: "Which design pattern should you apply?"
+    answer: "Facade. Create a CheckoutFacade @Service that encapsulates the orchestration behind a single checkout() method. The controller calls only the facade, hiding subsystem complexity."
+    tags:
+      - design-patterns
+      - facade
+      - scenario
+
+  - id: arq-designpatterns-012
+    type: scenario
+    situation: "Your commission calculation has five rules depending on insurance type, implemented as an 80-line if-else chain in a service."
+    question: "Which pattern would you refactor to, and how in Spring?"
+    answer: "Strategy pattern. Define a ComissaoStrategy interface with five implementations. Inject Map<TipoConvenio, ComissaoStrategy> — Spring auto-populates it. Adding a new type means creating one class with zero changes to the service."
+    tags:
+      - design-patterns
+      - strategy
+      - scenario
+
+  # --- PITFALL (3) ---
+  - id: arq-designpatterns-013
+    type: pitfall
+    trap: "Creating a Strategy interface with only one implementation 'just in case we need another later'."
+    why: "Premature abstraction adds indirection without benefit. The second implementation may never come. Code becomes harder to navigate for no reason. YAGNI applies."
+    prevention: "Use a concrete class until the second implementation actually appears. Refactoring to Strategy later is cheap; unnecessary abstraction now is expensive cognitive overhead."
+    tags:
+      - design-patterns
+      - strategy
+      - pitfall
+
+  - id: arq-designpatterns-014
+    type: pitfall
+    trap: "Implementing Singleton manually instead of using the framework's container."
+    why: "Manual Singleton (static getInstance()) hides dependencies, makes testing hard, and creates global mutable state. It couples callers without declaring the dependency."
+    prevention: "Declare the class as a @Service/@Component bean. The Spring container manages singleton scope without the downsides of the classic pattern."
+    tags:
+      - design-patterns
+      - singleton
+      - pitfall
+
+  - id: arq-designpatterns-015
+    type: pitfall
+    trap: "Using synchronous @EventListener for fire-and-forget side effects like sending emails after registration."
+    why: "Synchronous listeners run in the same thread and transaction. If the listener fails, it can affect the main flow. The email failure could roll back user registration."
+    prevention: "Use @Async + @EventListener for true fire-and-forget. Or use @TransactionalEventListener(phase = AFTER_COMMIT) to ensure the main transaction completes first."
+    tags:
+      - design-patterns
+      - observer
+      - spring
+      - pitfall

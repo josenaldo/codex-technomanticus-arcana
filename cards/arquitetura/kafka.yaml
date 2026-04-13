@@ -1,0 +1,148 @@
+source: "Arquitetura/Mensageria/Kafka.md"
+source_hash: "0322233338a6"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+
+  - id: arq-kafka-001
+    type: basic
+    front: "What is Kafka's fundamental abstraction and why does it enable high throughput?"
+    back: "An immutable append-only log partitioned across brokers. Writes are sequential disk appends (fast), reads use offsets. This model enables high throughput, replay, and multiple independent consumers."
+    tags:
+      - kafka
+      - conceitos
+
+  - id: arq-kafka-002
+    type: basic
+    front: "What are the three producer acks settings in Kafka and which should you use in production?"
+    back: "acks=0 (fire-and-forget), acks=1 (leader confirmed), acks=all (all ISRs confirmed). Use acks=all in production with min.insync.replicas=2 and replication.factor=3 for durability."
+    tags:
+      - kafka
+      - producer
+
+  - id: arq-kafka-003
+    type: basic
+    front: "What is Log Compaction in Kafka and when is it used?"
+    back: "Retains only the latest value per key, discarding older versions. Tombstone (key, null) deletes a key. Used for maintaining current state as a stream, enabling new consumers to rebuild state from the topic."
+    tags:
+      - kafka
+      - retention
+
+  - id: arq-kafka-004
+    type: basic
+    front: "What is Kafka's Exactly-Once Semantics (EOS) and what are its limitations?"
+    back: "EOS uses idempotent producer + transactional producer + consumer in read_committed mode. Atomic read-process-write within Kafka. Limitation: only works inside the Kafka cluster, not for external side effects."
+    tags:
+      - kafka
+      - exactly-once
+
+  - id: arq-kafka-005
+    type: basic
+    front: "What is KRaft in Kafka and why was it introduced?"
+    back: "KRaft replaces Zookeeper with Raft-based internal metadata management. Benefits: one fewer system to operate, more scalable metadata, faster recovery, simpler deployment. Zookeeper is deprecated since Kafka 3.3+."
+    tags:
+      - kafka
+      - kraft
+
+  # === CLOZE (3) ===
+
+  - id: arq-kafka-006
+    type: cloze
+    text: "In Kafka, a {{c1::partition}} is the unit of parallelism and ordering. Messages within the same partition are ordered; messages across partitions have {{c2::no ordering guarantee}}."
+    tags:
+      - kafka
+      - partitions
+
+  - id: arq-kafka-007
+    type: cloze
+    text: "Kafka's {{c1::ISR (In-Sync Replicas)}} are replicas up-to-date with the leader. With acks=all and {{c2::min.insync.replicas=2}}, a write tolerates one broker failure without data loss."
+    tags:
+      - kafka
+      - replication
+
+  - id: arq-kafka-008
+    type: cloze
+    text: "In a Kafka consumer group, each partition is assigned to {{c1::exactly one consumer}}. If you have more consumers than partitions, the extras are {{c2::idle}}."
+    tags:
+      - kafka
+      - consumer-group
+
+  # === VOCAB (2) ===
+
+  - id: arq-kafka-009
+    type: vocab
+    term_pt: "compactacao de log"
+    term_en: "log compaction"
+    definition: "Kafka retention mode that keeps only the latest message per key, with no time limit, enabling state reconstruction from topic."
+    usage: "Log compaction lets me use Kafka as both an event log and a source of truth for current state."
+    tags:
+      - kafka
+      - vocabulario
+
+  - id: arq-kafka-010
+    type: vocab
+    term_pt: "atraso do consumidor"
+    term_en: "consumer lag"
+    definition: "Difference between the latest offset in a partition and the consumer's current offset. The most important Kafka metric."
+    usage: "Consumer lag is the most important metric I monitor in production -- it tells you if consumers can keep up."
+    tags:
+      - kafka
+      - vocabulario
+
+  # === SCENARIO (2) ===
+
+  - id: arq-kafka-011
+    type: scenario
+    situation: "A Kafka consumer has growing lag on one partition despite normal load. Processing takes ~2s per message, max.poll.records=500, and max.poll.interval.ms=300000 (5min)."
+    question: "What is likely causing the issue and how do you fix it?"
+    answer: "500 messages x 2s = 1000s exceeds the 5min poll interval, triggering infinite rebalances. Fix: reduce max.poll.records to 50 and optimize processing time. Also consider increasing concurrency."
+    tags:
+      - kafka
+      - consumer-tuning
+      - scenario
+
+  - id: arq-kafka-012
+    type: scenario
+    situation: "You're launching a new analytics module months after your Kafka topics started receiving events. The module needs historical data."
+    question: "How do you provide the analytics service with all past events?"
+    answer: "Create a new consumer group with auto.offset.reset=earliest. Kafka's retention keeps events; the new consumer replays from the beginning. This is impossible with RabbitMQ where messages are deleted after consumption."
+    tags:
+      - kafka
+      - replay
+      - scenario
+
+  # === PITFALL (3) ===
+
+  - id: arq-kafka-013
+    type: pitfall
+    trap: "Using auto-commit for consumer offsets in production."
+    why: "Auto-commit may advance the offset before the message is actually processed. If the consumer crashes mid-processing, the message is silently lost."
+    prevention: "Disable auto-commit. Use manual commit after successful processing. Pattern: poll -> process batch -> commitSync()."
+    tags:
+      - kafka
+      - consumer
+      - offset
+
+  - id: arq-kafka-014
+    type: pitfall
+    trap: "Changing the number of partitions on an existing topic with keyed messages."
+    why: "Partition assignment uses hash(key) % num_partitions. Changing partitions causes the same key to map to a different partition, breaking ordering guarantees for that key."
+    prevention: "Dimension partitions with headroom from the start (2-3x expected parallelism). Repartitioning keyed topics requires careful migration."
+    tags:
+      - kafka
+      - partitions
+
+  - id: arq-kafka-015
+    type: pitfall
+    trap: "Choosing a partition key with skewed distribution (e.g., country code in a single-country app)."
+    why: "99% of messages land in one partition, creating a hot partition. Parallelism is wasted; one consumer does all the work while others are idle."
+    prevention: "Choose keys with uniform distribution (user_id, order_id). Monitor partition sizes. Consider composite keys if needed."
+    tags:
+      - kafka
+      - partitions
+      - design

@@ -1,0 +1,146 @@
+source: "Arquitetura/Mensageria/Event Streaming.md"
+source_hash: "f65e0550ebe0"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+
+  - id: arq-evtstream-001
+    type: basic
+    front: "What are the three styles of event-driven architecture (Martin Fowler)?"
+    back: "1) Event Notification -- minimal event, consumer calls back for details. 2) Event-Carried State Transfer -- event carries all data, no callback needed. 3) Event Sourcing -- events ARE the source of truth, state is derived by replay."
+    tags:
+      - event-streaming
+      - eda
+
+  - id: arq-evtstream-002
+    type: basic
+    front: "What is Event Sourcing and when should you use it?"
+    back: "Pattern where the event log is the source of truth. State is derived by replaying events. Use when audit trails are regulatory requirements, you need temporal debugging, or the domain benefits from replay. Avoid for simple CRUD."
+    tags:
+      - event-streaming
+      - event-sourcing
+
+  - id: arq-evtstream-003
+    type: basic
+    front: "What is CQRS and how does it relate to event streaming?"
+    back: "Command Query Responsibility Segregation: separate write model (normalized, ACID) from read model(s) (denormalized, optimized). Events from write side feed read model projections. Introduces eventual consistency between models."
+    tags:
+      - event-streaming
+      - cqrs
+
+  - id: arq-evtstream-004
+    type: basic
+    front: "What are the three types of windowing in stream processing?"
+    back: "Tumbling -- fixed windows, no overlap (e.g., count per minute). Hopping -- fixed windows with overlap (e.g., 5-min average every 1 min). Session -- dynamic windows based on inactivity gap (e.g., user session)."
+    tags:
+      - event-streaming
+      - stream-processing
+
+  - id: arq-evtstream-005
+    type: basic
+    front: "What are the key schema evolution rules for events?"
+    back: "Adding a field with default is safe. Removing a field is never safe. Renaming is breaking (= remove + add). Changing type is breaking. Use Schema Registry with compatibility modes (BACKWARD/FORWARD/FULL) to enforce rules."
+    tags:
+      - event-streaming
+      - schema-evolution
+
+  # === CLOZE (3) ===
+
+  - id: arq-evtstream-006
+    type: cloze
+    text: "Events should be named in {{c1::past tense}} (e.g., OrderPlaced, not PlaceOrder) because an event is a {{c2::fact that already happened}}, not a command."
+    tags:
+      - event-streaming
+      - event-design
+
+  - id: arq-evtstream-007
+    type: cloze
+    text: "In CQRS, the write model is {{c1::normalized}} with strong consistency, while read models are {{c2::denormalized}} and optimized for specific queries with eventual consistency."
+    tags:
+      - event-streaming
+      - cqrs
+
+  - id: arq-evtstream-008
+    type: cloze
+    text: "In stream processing, always aggregate by {{c1::event time}} rather than {{c2::processing time}}, otherwise metrics are inaccurate during replays or catch-up."
+    tags:
+      - event-streaming
+      - stream-processing
+
+  # === VOCAB (2) ===
+
+  - id: arq-evtstream-009
+    type: vocab
+    term_pt: "transferencia de estado via evento"
+    term_en: "event-carried state transfer (ECST)"
+    definition: "Event pattern where the event carries all data consumers need, eliminating callbacks to the producer and maximizing decoupling and resilience."
+    usage: "My default for microservices is event-carried state transfer for maximum decoupling."
+    tags:
+      - event-streaming
+      - vocabulario
+
+  - id: arq-evtstream-010
+    type: vocab
+    term_pt: "id de correlacao"
+    term_en: "correlation ID"
+    definition: "A unique identifier propagated through all events in a distributed flow, enabling end-to-end distributed tracing across services."
+    usage: "I always include correlation_id and causation_id in event metadata for distributed tracing."
+    tags:
+      - event-streaming
+      - vocabulario
+
+  # === SCENARIO (2) ===
+
+  - id: arq-evtstream-011
+    type: scenario
+    situation: "You need to replay 2 weeks of events to fix a bug in a read model projection. The events include OrderConfirmed which triggers email notifications."
+    question: "How do you replay without sending thousands of duplicate emails?"
+    answer: "Design consumers with a 'replay mode' flag that disables external side effects (emails, payments, webhooks). Replay only updates the projection. Re-enable side effects after replay completes."
+    tags:
+      - event-streaming
+      - replay
+      - scenario
+
+  - id: arq-evtstream-012
+    type: scenario
+    situation: "Your booking system needs fast read performance for available slots (queried hundreds of times per reservation) but strong consistency for the actual reservation."
+    question: "How do you architect this?"
+    answer: "CQRS: write model in PostgreSQL with strong consistency (prevents double-booking). Read model in Redis cache, populated by Kafka events. Eventual consistency on reads is acceptable; writes always validate against the source of truth."
+    tags:
+      - event-streaming
+      - cqrs
+      - scenario
+
+  # === PITFALL (3) ===
+
+  - id: arq-evtstream-013
+    type: pitfall
+    trap: "Confusing Event Notification with Event Sourcing and saying 'we do event-driven' without specifying the pattern."
+    why: "The three styles solve different problems with different trade-offs. Conflating them leads to wrong architectural decisions and miscommunication in the team."
+    prevention: "Always be explicit: 'We use event-carried state transfer for inter-service communication' or 'We use event sourcing for the audit log in the financial domain.'"
+    tags:
+      - event-streaming
+      - eda
+
+  - id: arq-evtstream-014
+    type: pitfall
+    trap: "Adopting Event Sourcing when simple CRUD would suffice."
+    why: "Event Sourcing has high complexity: schema evolution with upcasters, snapshots for performance, projections for queries, GDPR challenges (cryptographic erasure), and a steep learning curve."
+    prevention: "Only use Event Sourcing when the historical event log itself has clear value (regulatory audit, financial, temporal debugging). Default to event-carried state transfer."
+    tags:
+      - event-streaming
+      - event-sourcing
+
+  - id: arq-evtstream-015
+    type: pitfall
+    trap: "Publishing events named as commands (e.g., 'SendEmail' instead of 'OrderConfirmed')."
+    why: "Commands have a specific target and can be rejected. Events are facts with zero or more consumers. Publishing commands as events creates hidden coupling and confuses the architecture."
+    prevention: "Events in past tense (OrderPlaced, PaymentProcessed). Commands in imperative (PlaceOrder). If you want to trigger an action, publish the fact; let the consumer decide to act."
+    tags:
+      - event-streaming
+      - event-design

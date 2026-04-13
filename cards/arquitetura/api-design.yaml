@@ -1,0 +1,147 @@
+source: "Arquitetura/API Design.md"
+source_hash: "3770c1bc481c"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: arq-apidesign-001
+    type: basic
+    front: "What is the difference between HTTP 401 and 403 status codes?"
+    back: "401 means unauthenticated — the server doesn't know who you are. 403 means authenticated but unauthorized — the server knows you but you lack permission for this action."
+    tags:
+      - api-design
+      - status-codes
+
+  - id: arq-apidesign-002
+    type: basic
+    front: "What is the Idempotency Key pattern (Stripe style) and why is it needed?"
+    back: "Client sends a unique UUID via Idempotency-Key header on POST requests. Server caches (key -> response) with TTL. On retry with same key, returns cached response without re-executing. Prevents duplicate creates from network retries."
+    tags:
+      - api-design
+      - idempotency
+
+  - id: arq-apidesign-003
+    type: basic
+    front: "When should you use cursor-based pagination instead of offset-based?"
+    back: "Use cursor-based for large/changing datasets (feeds, timelines, logs). It has constant performance regardless of depth and avoids page drift. Use offset-based for small/stable datasets where jumping to a specific page is needed."
+    tags:
+      - api-design
+      - pagination
+
+  - id: arq-apidesign-004
+    type: basic
+    front: "What are the mandatory fields in an RFC 9457 Problem Details error response?"
+    back: "Three mandatory fields: type (URI identifying the error type), title (short human-readable summary, constant per type), and status (HTTP status code as integer)."
+    tags:
+      - api-design
+      - error-handling
+
+  - id: arq-apidesign-005
+    type: basic
+    front: "What is the difference between PUT and PATCH in REST?"
+    back: "PUT replaces the entire resource — omitting a field removes it. PATCH modifies only the sent fields, leaving others intact. PUT is idempotent by definition; PATCH may or may not be depending on implementation."
+    tags:
+      - api-design
+      - http-methods
+
+  # --- CLOZE (3) ---
+  - id: arq-apidesign-006
+    type: cloze
+    text: "In REST, resources are modeled as {{c1::nouns (substantivos)}}, not verbs. Use /patients, not /getPatients. The correct path style is {{c2::kebab-case}} for URLs and camelCase for JSON payloads."
+    tags:
+      - api-design
+      - rest
+
+  - id: arq-apidesign-007
+    type: cloze
+    text: "Webhook security uses {{c1::HMAC-SHA256}} signatures to guarantee authenticity and integrity. Include a {{c2::timestamp}} in the signature and reject webhooks older than 5 minutes to prevent replay attacks."
+    tags:
+      - api-design
+      - webhooks
+      - security
+
+  - id: arq-apidesign-008
+    type: cloze
+    text: "For long-running API operations, return {{c1::202 Accepted}} with a job ID and Location header. The client then {{c2::polls}} the job URL until status is completed."
+    tags:
+      - api-design
+      - async-operations
+
+  # --- VOCAB (2) ---
+  - id: arq-apidesign-009
+    type: vocab
+    term_pt: "chave de idempotência"
+    term_en: "idempotency key"
+    definition: "A unique client-generated identifier (UUID) sent with non-idempotent requests so the server can detect and deduplicate retries."
+    usage: "We use the idempotency key pattern for payment creation to prevent duplicate charges on network retries."
+    tags:
+      - api-design
+      - idempotency
+      - vocabulario
+
+  - id: arq-apidesign-010
+    type: vocab
+    term_pt: "versionamento de API"
+    term_en: "API versioning"
+    definition: "Strategy for evolving API contracts without breaking existing clients, typically via URL path (/v1/), headers, or query params."
+    usage: "We chose URL path versioning because it's explicit, visible in logs, and works with CDN caching."
+    tags:
+      - api-design
+      - versioning
+      - vocabulario
+
+  # --- SCENARIO (2) ---
+  - id: arq-apidesign-011
+    type: scenario
+    situation: "Your API receives a POST to create a payment, but a network timeout causes the client to retry the exact same request."
+    question: "How do you prevent creating a duplicate payment?"
+    answer: "Require an Idempotency-Key header. On retry, look up the key; if found, return the cached response. Store the key atomically with the operation in the same DB transaction to avoid race conditions."
+    tags:
+      - api-design
+      - idempotency
+      - scenario
+
+  - id: arq-apidesign-012
+    type: scenario
+    situation: "A user without permission requests GET /admin/users/42. Returning 403 reveals the endpoint exists."
+    question: "Should you return 403 Forbidden or 404 Not Found?"
+    answer: "It depends on your threat model. Return 404 to hide endpoint existence (security through obscurity). Return 403 if transparency matters more. Many public APIs choose 404 for sensitive endpoints."
+    tags:
+      - api-design
+      - security
+      - scenario
+
+  # --- PITFALL (3) ---
+  - id: arq-apidesign-013
+    type: pitfall
+    trap: "Returning HTTP 200 with {\"success\": false} in the body for errors."
+    why: "This confuses monitoring, caching, and retry logic. Clients and proxies use status codes — not body fields — to determine success. A 200 means success to every layer of infrastructure."
+    prevention: "Use proper 4xx/5xx status codes. Reserve 200 for genuine success. Follow RFC 9457 Problem Details for error bodies."
+    tags:
+      - api-design
+      - error-handling
+      - pitfall
+
+  - id: arq-apidesign-014
+    type: pitfall
+    trap: "Using offset-based pagination on large, frequently changing datasets."
+    why: "Large offsets degrade DB performance (reads and discards N rows). Inserts/deletes between requests cause items to be duplicated or skipped (page drift)."
+    prevention: "Use cursor-based (keyset) pagination. The cursor encodes the last item's sort key, using an index for O(log n) lookups regardless of depth."
+    tags:
+      - api-design
+      - pagination
+      - pitfall
+
+  - id: arq-apidesign-015
+    type: pitfall
+    trap: "Designing your REST API endpoints to mirror your database schema directly."
+    why: "This couples consumers to your persistence model. Schema changes force API breaking changes. Internal implementation details leak through the contract."
+    prevention: "Design APIs from the consumer's perspective. Use DTOs to decouple the API contract from internal models. Hide implementation details behind a clean resource-oriented interface."
+    tags:
+      - api-design
+      - rest
+      - pitfall

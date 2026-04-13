@@ -1,0 +1,146 @@
+source: "Arquitetura/Mensageria/RabbitMQ.md"
+source_hash: "b9d363e7dacd"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+
+  - id: arq-rabbitmq-001
+    type: basic
+    front: "What is the AMQP model in RabbitMQ and how does it differ from Kafka?"
+    back: "Producer publishes to an Exchange (not a queue). The Exchange routes to Queues via Bindings based on routing rules. In Kafka, producers write to topic partitions directly. This indirection gives RabbitMQ flexible routing."
+    tags:
+      - rabbitmq
+      - amqp
+
+  - id: arq-rabbitmq-002
+    type: basic
+    front: "What are the four exchange types in RabbitMQ?"
+    back: "Direct (exact routing key match), Fanout (broadcast to all bound queues, ignores key), Topic (pattern matching with * and # wildcards), Headers (match by message headers). Topic is the most versatile default."
+    tags:
+      - rabbitmq
+      - exchanges
+
+  - id: arq-rabbitmq-003
+    type: basic
+    front: "What is the full combination needed for message durability in RabbitMQ?"
+    back: "Durable exchange + durable queue + persistent message (delivery mode 2) + publisher confirms + manual consumer acks. Missing any one of these can cause message loss on broker restart or crash."
+    tags:
+      - rabbitmq
+      - durability
+
+  - id: arq-rabbitmq-004
+    type: basic
+    front: "What are Quorum Queues in RabbitMQ and why replace Mirrored Queues?"
+    back: "Quorum Queues use Raft consensus for strong consistency. They tolerate (N-1)/2 node failures, have better performance than mirrored queues in large clusters, and avoid split-brain. Mirrored queues are deprecated since RabbitMQ 3.9+."
+    tags:
+      - rabbitmq
+      - ha
+
+  - id: arq-rabbitmq-005
+    type: basic
+    front: "What is a Dead Letter Exchange (DLX) in RabbitMQ and when do messages go there?"
+    back: "A DLX receives messages that were rejected (nack without requeue), expired (TTL), or dropped (queue full). Configure x-dead-letter-exchange on the source queue. Essential for handling poison messages in production."
+    tags:
+      - rabbitmq
+      - dlx
+
+  # === CLOZE (3) ===
+
+  - id: arq-rabbitmq-006
+    type: cloze
+    text: "In RabbitMQ Topic Exchange, {{c1::*}} matches exactly one word and {{c2::#}} matches zero or more words in a routing key separated by dots."
+    tags:
+      - rabbitmq
+      - topic-exchange
+
+  - id: arq-rabbitmq-007
+    type: cloze
+    text: "In RabbitMQ, a {{c1::connection}} is a heavy TCP/AMQP link (long-lived, one per process), while a {{c2::channel}} is a lightweight logical multiplex over it (one per thread)."
+    tags:
+      - rabbitmq
+      - connections
+
+  - id: arq-rabbitmq-008
+    type: cloze
+    text: "RabbitMQ {{c1::prefetch count}} limits how many unacknowledged messages a consumer holds. Without it, the broker delivers everything to the first consumer, breaking {{c2::competing consumers}} fairness."
+    tags:
+      - rabbitmq
+      - qos
+
+  # === VOCAB (2) ===
+
+  - id: arq-rabbitmq-009
+    type: vocab
+    term_pt: "troca de mensagens mortas"
+    term_en: "dead letter exchange (DLX)"
+    definition: "An exchange that receives messages rejected, expired, or dropped from a source queue, routing them to a dead letter queue for investigation."
+    usage: "Every critical queue has a Dead Letter Exchange configured -- poison messages shouldn't cause infinite loops."
+    tags:
+      - rabbitmq
+      - vocabulario
+
+  - id: arq-rabbitmq-010
+    type: vocab
+    term_pt: "confirmacoes do publicador"
+    term_en: "publisher confirms"
+    definition: "Mechanism where the broker acknowledges receipt and persistence of a message, ensuring the publisher knows delivery succeeded."
+    usage: "Without publisher confirms, publishing is fire-and-forget -- you don't know if the broker received the message."
+    tags:
+      - rabbitmq
+      - vocabulario
+
+  # === SCENARIO (2) ===
+
+  - id: arq-rabbitmq-011
+    type: scenario
+    situation: "After a broker restart, all your queues and messages disappeared even though queues were declared durable."
+    question: "What likely went wrong?"
+    answer: "The exchange was created with durable=false. When the broker restarted, the exchange was lost along with all its bindings. All three must be durable: exchange, queue, and messages (persistent delivery mode)."
+    tags:
+      - rabbitmq
+      - durability
+      - scenario
+
+  - id: arq-rabbitmq-012
+    type: scenario
+    situation: "Your RabbitMQ publishers suddenly start blocking and the API becomes slow. Queue depth has been growing for hours."
+    question: "What is happening and how do you fix it?"
+    answer: "RabbitMQ hit the memory alarm (vm_memory_high_watermark). Growing queues consumed memory because a consumer crashed silently. Fix: restart consumer, add alerts for consumer count==0 and memory alarm activation."
+    tags:
+      - rabbitmq
+      - monitoring
+      - scenario
+
+  # === PITFALL (3) ===
+
+  - id: arq-rabbitmq-013
+    type: pitfall
+    trap: "Using autoAck (noAck: true) in production consumers."
+    why: "If the consumer crashes before processing, the message is lost -- RabbitMQ already removed it from the queue. Silent data loss."
+    prevention: "Always use manual acks (noAck: false). Call channel.ack(msg) only after successful processing. Use channel.nack() to reject to DLX on failure."
+    tags:
+      - rabbitmq
+      - consumer
+
+  - id: arq-rabbitmq-014
+    type: pitfall
+    trap: "Creating a new TCP connection per message instead of reusing connections with channels."
+    why: "Connections are heavy (TCP + AMQP handshake). Creating one per message causes resource leaks on the broker and poor performance."
+    prevention: "Use one long-lived connection per process. Multiplex with channels (one per thread). Never create connection per request."
+    tags:
+      - rabbitmq
+      - connections
+
+  - id: arq-rabbitmq-015
+    type: pitfall
+    trap: "Using deprecated Mirrored Queues for high availability in new clusters."
+    why: "Mirrored Queues have poor performance in large clusters, slow sync after reconnection, and split-brain issues in network partitions."
+    prevention: "Use Quorum Queues (x-queue-type: quorum) which use Raft consensus for strong consistency. Available since RabbitMQ 3.9+."
+    tags:
+      - rabbitmq
+      - ha

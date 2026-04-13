@@ -1,0 +1,146 @@
+source: "Arquitetura/Mensageria/BullMQ.md"
+source_hash: "cb545103516a"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+
+  - id: arq-bullmq-001
+    type: basic
+    front: "What are the core concepts in BullMQ?"
+    back: "Queue (named, backed by Redis), Job (unit of work with payload/options), Worker (consumes and processes jobs), QueueEvents (global event listener), FlowProducer (creates parent-child DAGs of jobs)."
+    tags:
+      - bullmq
+      - conceitos
+
+  - id: arq-bullmq-002
+    type: basic
+    front: "What is a sandboxed processor in BullMQ and when should you use it?"
+    back: "Runs the job handler in a separate child process. Use for CPU-heavy work (PDF generation, image processing) to avoid blocking the Node.js event loop. Isolates crashes so one job failure doesn't affect others."
+    tags:
+      - bullmq
+      - sandboxed-processor
+
+  - id: arq-bullmq-003
+    type: basic
+    front: "How do BullMQ Flows work?"
+    back: "FlowProducer creates a DAG of jobs. Parent job only executes after all children complete successfully. If any child permanently fails, the parent fails too. Used for workflows, task composition, and map-reduce patterns."
+    tags:
+      - bullmq
+      - flows
+
+  - id: arq-bullmq-004
+    type: basic
+    front: "Why is graceful shutdown important in BullMQ and how is it implemented?"
+    back: "Without it, deploys interrupt running jobs, leaving them stalled. Implement: listen for SIGTERM, call worker.close() which waits for in-progress jobs to finish before closing, then process.exit(0)."
+    tags:
+      - bullmq
+      - graceful-shutdown
+
+  - id: arq-bullmq-005
+    type: basic
+    front: "When should you NOT use BullMQ?"
+    back: "When you need event streaming/replay (use Kafka), cross-language service communication (use RabbitMQ/Kafka), pub/sub with multiple independent consumers (Kafka), or massive scale (millions of jobs/day). BullMQ is a job queue, not an event broker."
+    tags:
+      - bullmq
+      - design-decisions
+
+  # === CLOZE (3) ===
+
+  - id: arq-bullmq-006
+    type: cloze
+    text: "BullMQ requires {{c1::maxRetriesPerRequest: null}} in the ioredis configuration, otherwise it may {{c2::fail silently on reconnections}}."
+    tags:
+      - bullmq
+      - redis-config
+
+  - id: arq-bullmq-007
+    type: cloze
+    text: "BullMQ provides {{c1::at-least-once}} delivery, meaning jobs may be reprocessed after retries or crashes. Workers must be {{c2::idempotent}}."
+    tags:
+      - bullmq
+      - delivery-semantics
+
+  - id: arq-bullmq-008
+    type: cloze
+    text: "BullMQ's rate limiter is {{c1::per-worker}}, not global. With 3 worker instances each set to max 10/s, the effective rate is {{c2::30/s}} total."
+    tags:
+      - bullmq
+      - rate-limiting
+
+  # === VOCAB (2) ===
+
+  - id: arq-bullmq-009
+    type: vocab
+    term_pt: "processador isolado"
+    term_en: "sandboxed processor"
+    definition: "A BullMQ handler that runs in a separate child process, isolating CPU-heavy or crash-prone work from the main worker event loop."
+    usage: "For CPU-heavy work like PDF generation, I use sandboxed processors to avoid blocking the event loop."
+    tags:
+      - bullmq
+      - vocabulario
+
+  - id: arq-bullmq-010
+    type: vocab
+    term_pt: "desligamento gracioso"
+    term_en: "graceful shutdown"
+    definition: "Process of stopping a worker by finishing in-progress jobs before closing, preventing stalled jobs during deployment."
+    usage: "Graceful shutdown with worker.close() on SIGTERM prevents job interruption during deploys."
+    tags:
+      - bullmq
+      - vocabulario
+
+  # === SCENARIO (2) ===
+
+  - id: arq-bullmq-011
+    type: scenario
+    situation: "Your BullMQ worker generates PDFs using Puppeteer. Occasionally Chrome crashes, taking down the entire worker and stalling all parallel jobs."
+    question: "How do you isolate the failure?"
+    answer: "Use sandboxed processors: pass a file path instead of inline handler to new Worker(). Each job runs in a separate child process. Chrome crashes are isolated; other jobs continue unaffected."
+    tags:
+      - bullmq
+      - sandboxed-processor
+      - scenario
+
+  - id: arq-bullmq-012
+    type: scenario
+    situation: "You have 3 BullMQ worker instances, each with rate limiter set to max: 10 per second. Your external API allows 10 req/s total."
+    question: "Why are you getting 429 errors and how do you fix it?"
+    answer: "BullMQ rate limiter is per-worker. 3 workers x 10/s = 30/s total, exceeding the API limit. Implement centralized rate limiting using a shared Redis counter or set each worker to max: 3/s."
+    tags:
+      - bullmq
+      - rate-limiting
+      - scenario
+
+  # === PITFALL (3) ===
+
+  - id: arq-bullmq-013
+    type: pitfall
+    trap: "Running job processing inside the API process instead of a separate worker."
+    why: "Blocks the API event loop, making all HTTP responses slow. If the worker crashes, it takes down the API. Cannot scale workers independently."
+    prevention: "Separate API (producer) and Worker (consumer) into different processes/containers. API publishes jobs and responds immediately."
+    tags:
+      - bullmq
+      - architecture
+
+  - id: arq-bullmq-014
+    type: pitfall
+    trap: "Not cleaning completed/failed jobs from Redis."
+    why: "Redis fills with millions of historical jobs, causing memory pressure and performance degradation."
+    prevention: "Configure removeOnComplete (age + count limits) and removeOnFail (age limit) in defaultJobOptions. Run periodic queue.clean() for additional hygiene."
+    tags:
+      - bullmq
+      - redis
+
+  - id: arq-bullmq-015
+    type: pitfall
+    trap: "Using high concurrency with CPU-bound job handlers."
+    why: "Node.js is single-threaded. CPU-heavy handlers block the event loop, making all concurrent jobs slow and preventing heartbeats (causing stalled jobs)."
+    prevention: "Use sandboxed processors for CPU-bound work. Each job runs in its own child process, freeing the main event loop."
+    tags:
+      - bullmq
+      - concurrency

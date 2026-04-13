@@ -1,0 +1,144 @@
+source: "Arquitetura/Arquitetura de Software.md"
+source_hash: "1cf3a891f9cb"
+deck: "Codex::Arquitetura"
+generated: "2026-04-13"
+tags:
+  - arquitetura
+  - entrevista
+
+cards:
+  # --- BASIC (5) ---
+  - id: arq-arquitetura-001
+    type: basic
+    front: "What is the Dependency Rule in Clean/Hexagonal/Onion Architecture?"
+    back: "Dependencies must always point inward. The domain core knows nothing about infrastructure, frameworks, or UI. Outer layers depend on inner layers via interfaces (ports), never the reverse."
+    tags:
+      - clean-architecture
+      - hexagonal
+
+  - id: arq-arquitetura-002
+    type: basic
+    front: "What is a Modular Monolith and why is it recommended as a starting point?"
+    back: "A single deployable unit organized into well-bounded domain modules with strict interfaces between them. Gives monolith simplicity (one deploy, one DB) while enabling gradual extraction to microservices when concrete pain justifies it."
+    tags:
+      - modular-monolith
+      - microservices
+
+  - id: arq-arquitetura-003
+    type: basic
+    front: "What is a Bounded Context in DDD?"
+    back: "A boundary where a domain model is consistent. The same term (e.g. 'Customer') can have different meanings and models in different contexts. Each context ideally has its own code, model, and can become its own service or module."
+    tags:
+      - ddd
+      - bounded-context
+
+  - id: arq-arquitetura-004
+    type: basic
+    front: "What is the difference between an Entity and a Value Object in DDD?"
+    back: "An Entity has a persistent identity — two entities with the same ID are equal regardless of attributes. A Value Object is defined by its attributes, has no identity, and must be immutable. Two VOs with the same attributes are equal."
+    tags:
+      - ddd
+      - tactical-patterns
+
+  - id: arq-arquitetura-005
+    type: basic
+    front: "What is Conway's Law and what is the Inverse Conway Maneuver?"
+    back: "Conway's Law: software architecture mirrors the team communication structure. Inverse Conway Maneuver: intentionally design teams to match the desired architecture. Want 5 microservices? Form 5 autonomous teams aligned to them."
+    tags:
+      - conways-law
+      - team-topologies
+
+  # --- CLOZE (3) ---
+  - id: arq-arquitetura-006
+    type: cloze
+    text: "In Hexagonal Architecture, {{c1::Driving (primary) ports}} are interfaces the outside world uses to invoke the application, while {{c2::Driven (secondary) ports}} are interfaces the application uses to access external resources like databases."
+    tags:
+      - hexagonal
+      - ports-and-adapters
+
+  - id: arq-arquitetura-007
+    type: cloze
+    text: "DDD classifies subdomains into three types: {{c1::Core Domain}} (unique strategic advantage — invest best team), Supporting (important but not differentiating), and {{c2::Generic}} (commoditized — use off-the-shelf solutions)."
+    tags:
+      - ddd
+      - strategic-design
+
+  - id: arq-arquitetura-008
+    type: cloze
+    text: "The Strangler Fig Pattern migrates from monolith to microservices {{c1::gradually}}, routing traffic through a proxy. New features go to new services while old functionality is {{c2::incrementally replaced}} until the monolith dies."
+    tags:
+      - strangler-fig
+      - migration
+
+  # --- VOCAB (2) ---
+  - id: arq-arquitetura-009
+    type: vocab
+    term_pt: "linguagem ubiqua"
+    term_en: "ubiquitous language"
+    definition: "Shared terminology used consistently between developers, domain experts, documentation, and code within a bounded context."
+    usage: "We established a ubiquitous language through Event Storming workshops so that 'consulta' in our code matches the business term exactly."
+    tags:
+      - ddd
+      - vocabulario
+
+  - id: arq-arquitetura-010
+    type: vocab
+    term_pt: "agregado"
+    term_en: "aggregate"
+    definition: "A cluster of entities and value objects with a root entity that enforces invariants. One transaction modifies one aggregate; cross-aggregate communication uses domain events."
+    usage: "The Order aggregate contains OrderItems internally — you can only add items through the Order root, which validates business rules."
+    tags:
+      - ddd
+      - vocabulario
+
+  # --- SCENARIO (2) ---
+  - id: arq-arquitetura-011
+    type: scenario
+    situation: "Your team wants to break a monolith into microservices because 'Netflix does it' and 'it looks good on resumes'."
+    question: "What concrete pain should justify a microservices migration?"
+    answer: "Justify with: heterogeneous scaling needs, teams too large for one deploy, different tech stacks per domain, critical fault isolation, or need for independent deploy velocity. Without concrete pain, a modular monolith is better."
+    tags:
+      - microservices
+      - trade-offs
+      - scenario
+
+  - id: arq-arquitetura-012
+    type: scenario
+    situation: "You have a Domain Service that manipulates two Aggregates atomically in one database transaction."
+    question: "Why is this problematic in DDD and how should you fix it?"
+    answer: "DDD rule: one transaction = one aggregate. Modify one aggregate, publish a domain event, and let the second aggregate react via eventual consistency. This respects aggregate boundaries and scales to distributed systems."
+    tags:
+      - ddd
+      - aggregate
+      - scenario
+
+  # --- PITFALL (3) ---
+  - id: arq-arquitetura-013
+    type: pitfall
+    trap: "Building an Anemic Domain Model where entities are just getters/setters and all logic lives in services."
+    why: "Loses encapsulation — the core OOP benefit. Business rules scatter across services, making them hard to find, test, and keep consistent. Martin Fowler calls it an anti-pattern."
+    prevention: "Put behavior in domain objects. Order.addItem() validates rules internally. Services orchestrate, but domain logic belongs in entities and value objects."
+    tags:
+      - ddd
+      - anti-pattern
+      - pitfall
+
+  - id: arq-arquitetura-014
+    type: pitfall
+    trap: "Creating a Distributed Monolith — microservices that must be deployed together to work."
+    why: "You get the costs of both architectures (network latency, distributed debugging, operational complexity) without the benefits of either (independent deployment, fault isolation)."
+    prevention: "Ensure each service can deploy and fail independently. Avoid shared databases. Use async communication (events) over synchronous calls between services."
+    tags:
+      - microservices
+      - anti-pattern
+      - pitfall
+
+  - id: arq-arquitetura-015
+    type: pitfall
+    trap: "Applying Clean Architecture to a simple CRUD with 3 endpoints."
+    why: "Over-engineering wastes effort. Ports, adapters, use cases, and multiple layers add ceremony without value when the domain is trivial. Architecture should be proportional to problem complexity."
+    prevention: "Start with Layered or Tomato Architecture for simple projects. Refactor toward Hexagonal only when complexity justifies the indirection."
+    tags:
+      - clean-architecture
+      - over-engineering
+      - pitfall
