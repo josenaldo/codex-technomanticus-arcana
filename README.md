@@ -25,13 +25,13 @@ Baixe a nova release e importe novamente. O Anki faz merge por ID — cards exis
 
 ## Tipos de cards
 
-| Tipo | Descrição |
-|------|-----------|
-| **Basic** | Pergunta e resposta direta |
-| **Cloze** | Preenchimento de lacuna |
-| **Vocab** | Vocabulário bilíngue PT-BR ↔ EN |
-| **Scenario** | Situação prática com pergunta |
-| **Pitfall** | Armadilha comum e como evitar |
+| Tipo         | Descrição                       |
+| ------------ | ------------------------------- |
+| **Basic**    | Pergunta e resposta direta      |
+| **Cloze**    | Preenchimento de lacuna         |
+| **Vocab**    | Vocabulário bilíngue PT-BR ↔ EN |
+| **Scenario** | Situação prática com pergunta   |
+| **Pitfall**  | Armadilha comum e como evitar   |
 
 ## Licença
 
