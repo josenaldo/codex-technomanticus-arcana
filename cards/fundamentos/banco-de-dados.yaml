@@ -1,0 +1,127 @@
+source: "Fundamentos/Banco de dados.md"
+source_hash: "e2fd0aa9c61f"
+deck: "Codex::Fundamentos"
+generated: "2026-04-13"
+tags:
+  - fundamentos
+  - entrevista
+
+cards:
+  - id: fund-bd-001
+    type: basic
+    front: "O que significa ACID em bancos de dados?"
+    back: |
+      Atomicity — transação é tudo ou nada
+      Consistency — invariantes do schema sempre preservadas
+      Isolation — transações concorrentes não veem estados intermediários
+      Durability — dados commitados sobrevivem a falhas
+    tags: [banco-de-dados, acid]
+
+  - id: fund-bd-002
+    type: cloze
+    text: "O nível de isolamento padrão do PostgreSQL é {{c1::READ COMMITTED}}, enquanto o do MySQL/InnoDB é {{c2::REPEATABLE READ}}."
+    tags: [banco-de-dados, isolamento]
+
+  - id: fund-bd-003
+    type: basic
+    front: "Qual a diferença entre dirty read, non-repeatable read e phantom read?"
+    back: |
+      Dirty read: ler dados de transação não commitada.
+      Non-repeatable read: reler mesma linha e receber valor
+      diferente (alguém fez UPDATE).
+      Phantom read: reler conjunto de linhas e receber linhas
+      diferentes (alguém fez INSERT/DELETE).
+    tags: [banco-de-dados, isolamento]
+
+  - id: fund-bd-004
+    type: basic
+    front: "Qual a regra do leftmost prefix em índices compostos?"
+    back: |
+      Índice em (a, b, c) serve para queries filtrando por:
+      a sozinho, (a, b) e (a, b, c). Não serve para b sozinho
+      nem para (b, c). Colunas mais seletivas devem vir
+      primeiro, e as usadas em range no final.
+    tags: [banco-de-dados, indices]
+
+  - id: fund-bd-005
+    type: pitfall
+    trap: "Usar UUID v4 como primary key"
+    why: "Chaves aleatórias forçam inserts em páginas aleatórias do B-Tree, causando page splits e fragmentação. Em tabelas grandes, derruba performance de insert."
+    prevention: "Use UUID v7 (ordenável por tempo) ou ULID se precisa de IDs distribuídos."
+    tags: [banco-de-dados, armadilhas, indices]
+
+  - id: fund-bd-006
+    type: pitfall
+    trap: "N+1 queries em ORMs"
+    why: "Carregar lista e acessar relacionamento lazy no loop gera 1 query + N queries extras. É o bug mais comum em JPA/Hibernate."
+    prevention: "Use JOIN FETCH, @EntityGraph, projeções DTO ou configure batch size."
+    tags: [banco-de-dados, armadilhas, orm]
+
+  - id: fund-bd-007
+    type: cloze
+    text: "Normalização até {{c1::3NF}} é o alvo prático. Desnormalizar só quando há {{c2::query dominante que custa muito mesmo com índices}}."
+    tags: [banco-de-dados, modelagem]
+
+  - id: fund-bd-008
+    type: basic
+    front: "O que procurar ao analisar EXPLAIN ANALYZE?"
+    back: |
+      Seq Scan em tabela grande (falta índice), Nested Loop
+      com muitas linhas (O(n×m)), rows vs actual rows muito
+      diferente (estatísticas desatualizadas — rode ANALYZE),
+      e Index Scan/Index Only Scan (índice sendo usado).
+    tags: [banco-de-dados, performance]
+
+  - id: fund-bd-009
+    type: scenario
+    situation: "Você precisa gerar IDs únicos fora do banco, em múltiplos microserviços, sem depender de sequência centralizada."
+    question: "Qual tipo de ID usar e por quê?"
+    answer: "UUID v7 ou ULID — são ordenáveis por tempo (não fragmentam B-Tree como UUID v4) e distribuídos (não dependem do banco para geração)."
+    tags: [banco-de-dados, modelagem]
+
+  - id: fund-bd-010
+    type: basic
+    front: "Qual a diferença entre optimistic e pessimistic locking?"
+    back: |
+      Optimistic: assume conflitos raros, usa campo version.
+      Na atualização verifica se versão mudou — se sim, retry.
+      Pessimistic: trava linha ao ler (SELECT FOR UPDATE),
+      bloqueando outros. Usar quando contenção é alta.
+    tags: [banco-de-dados, concorrencia]
+
+  - id: fund-bd-011
+    type: vocab
+    term_pt: "Plano de execução"
+    term_en: "Query execution plan"
+    definition: "The sequence of operations the database uses to execute a query, showing index usage, join strategies, and estimated costs."
+    usage: "I'd run EXPLAIN ANALYZE to check the query execution plan before adding an index."
+    tags: [banco-de-dados, vocabulario]
+
+  - id: fund-bd-012
+    type: vocab
+    term_pt: "Consistência eventual"
+    term_en: "Eventual consistency"
+    definition: "A consistency model where, if no new writes occur, all replicas will eventually converge to the same state."
+    usage: "Eventual consistency is acceptable for counters and feeds, but not for bank balances."
+    tags: [banco-de-dados, vocabulario]
+
+  - id: fund-bd-013
+    type: cloze
+    text: "Em CAP theorem, como partições sempre podem acontecer, a escolha real é entre {{c1::CP}} (consistência + tolerância a partição) e {{c2::AP}} (disponibilidade + tolerância a partição)."
+    tags: [banco-de-dados, distribuido]
+
+  - id: fund-bd-014
+    type: basic
+    front: "Quais são os 3 passos de uma zero-downtime migration (expand-migrate-contract)?"
+    back: |
+      1. Expand — adicionar nova estrutura mantendo a antiga
+      2. Migrate — atualizar código e copiar dados
+      3. Contract — remover a antiga depois que deploy estabilizar
+    tags: [banco-de-dados, operacao]
+
+  - id: fund-bd-015
+    type: pitfall
+    trap: "Usar OFFSET alto para paginação"
+    why: "OFFSET 100000 faz o banco ler 100k linhas e descartá-las. Performance degrada linearmente com a profundidade da página."
+    prevention: "Use cursor/keyset pagination: WHERE id > last_seen_id ORDER BY id LIMIT N."
+    tags: [banco-de-dados, armadilhas, performance]

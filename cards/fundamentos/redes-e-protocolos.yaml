@@ -1,0 +1,130 @@
+source: "Fundamentos/Redes e Protocolos.md"
+source_hash: "ed31115fccfd"
+deck: "Codex::Fundamentos"
+generated: "2026-04-13"
+tags:
+  - fundamentos
+  - entrevista
+
+cards:
+  - id: fund-redes-001
+    type: basic
+    front: "Quais são as 3 garantias do TCP que o UDP não oferece?"
+    back: |
+      1. Entrega confiável — retransmite pacotes perdidos
+      2. Ordenação — pacotes chegam na ordem correta
+      3. Controle de fluxo e congestionamento — adapta taxa
+      ao que receptor e rede suportam
+    tags: [redes, tcp-udp]
+
+  - id: fund-redes-002
+    type: cloze
+    text: "O three-way handshake do TCP é: {{c1::SYN → SYN-ACK → ACK}}. Custa {{c2::1 RTT}} extra antes do primeiro byte de dados."
+    tags: [redes, tcp]
+
+  - id: fund-redes-003
+    type: basic
+    front: "Por que conexões TCP novas são mais lentas e como mitigar?"
+    back: |
+      TCP slow start: janela começa pequena (~14KB) e dobra
+      a cada RTT. Mitigações: keep-alive / connection pooling
+      (reutilizar conexões aquecidas), HTTP/2 multiplexing
+      (uma conexão para múltiplas requests).
+    tags: [redes, tcp, performance]
+
+  - id: fund-redes-004
+    type: basic
+    front: "Qual a hierarquia de resolução DNS?"
+    back: |
+      Browser cache → OS cache → Resolver (ISP) →
+      Root NS → TLD NS (.com) → Authoritative NS
+      (example.com). Cada nível cacheia conforme o TTL
+      do registro.
+    tags: [redes, dns]
+
+  - id: fund-redes-005
+    type: cloze
+    text: "CORS é mecanismo do {{c1::browser}}, não do servidor. Qualquer {{c2::curl ou backend}} bypassa completamente."
+    tags: [redes, http, seguranca]
+
+  - id: fund-redes-006
+    type: basic
+    front: "Qual a diferença entre os status 401 e 403?"
+    back: |
+      401 Unauthorized = "não sei quem você é" (autenticação
+      ausente ou inválida). 403 Forbidden = "sei quem você é,
+      mas não tem permissão" (autorização negada).
+    tags: [redes, http]
+
+  - id: fund-redes-007
+    type: pitfall
+    trap: "Não definir timeout em chamadas de rede"
+    why: "Sem timeout, uma thread/conexão fica presa para sempre se o servidor travar. Esgota connection pool e causa cascata de falhas."
+    prevention: "Defina sempre connection timeout (~1-5s) e read timeout (~5-30s). Toda chamada de rede precisa de timeout."
+    tags: [redes, armadilhas, performance]
+
+  - id: fund-redes-008
+    type: basic
+    front: "Quando usar REST, GraphQL e gRPC?"
+    back: |
+      REST: API pública, CRUD, cacheável, tooling maduro.
+      GraphQL: clientes com necessidades variadas (mobile
+      vs web), schema tipado. gRPC: microserviços internos
+      de alta performance, contrato forte, streaming.
+    tags: [redes, api-design]
+
+  - id: fund-redes-009
+    type: cloze
+    text: "HTTP/3 usa {{c1::QUIC sobre UDP}} em vez de TCP, eliminando {{c2::head-of-line blocking}} e reduzindo handshake para 1 RTT."
+    tags: [redes, http]
+
+  - id: fund-redes-010
+    type: scenario
+    situation: "Você precisa push do servidor para dashboard de monitoramento, mas o fluxo é unidirecional (servidor → cliente)."
+    question: "WebSocket ou SSE?"
+    answer: "SSE (Server-Sent Events). É mais simples, reconecta automaticamente, funciona com HTTP/2 e CDNs sem configuração extra. WebSocket só para bidirecional (chat, gaming)."
+    tags: [redes, websocket, sse]
+
+  - id: fund-redes-011
+    type: vocab
+    term_pt: "Balanceamento de carga"
+    term_en: "Load balancing"
+    definition: "Distributing incoming network traffic across multiple servers to ensure no single server bears too much demand."
+    usage: "We use an L7 load balancer that routes based on HTTP path — API requests go to backend servers, static assets to CDN."
+    tags: [redes, vocabulario]
+
+  - id: fund-redes-012
+    type: vocab
+    term_pt: "Disjuntor"
+    term_en: "Circuit breaker"
+    definition: "Pattern that stops calling a failing service after N consecutive failures, preventing cascade failures and allowing recovery time."
+    usage: "I'd add a circuit breaker on this external API call so a downstream outage doesn't cascade to our service."
+    tags: [redes, vocabulario, resiliencia]
+
+  - id: fund-redes-013
+    type: basic
+    front: "O que é idempotência em HTTP e por que importa?"
+    back: |
+      Chamar N vezes produz o mesmo resultado que chamar 1 vez.
+      GET, PUT, DELETE são idempotentes; POST não é. Crítico
+      para retries: se a rede falhar após enviar, um retry
+      idempotente é seguro; um POST pode duplicar o recurso.
+    tags: [redes, http]
+
+  - id: fund-redes-014
+    type: pitfall
+    trap: "Retry sem backoff exponencial"
+    why: "Retry imediato e repetido amplifica falhas em cascata (thundering herd) — todos os clientes retentam ao mesmo tempo, derrubando o servidor."
+    prevention: "Use exponential backoff (1s→2s→4s→8s) com jitter (aleatoriedade) para espalhar retries no tempo."
+    tags: [redes, armadilhas, resiliencia]
+
+  - id: fund-redes-015
+    type: basic
+    front: "O que é mTLS e quando usar?"
+    back: |
+      Mutual TLS: ambos os lados (cliente e servidor)
+      apresentam certificado, autenticando-se mutuamente.
+      Usado em comunicação entre microserviços (service mesh,
+      Istio) para garantir que só serviços autorizados se
+      comuniquem.
+    tags: [redes, seguranca, tls]

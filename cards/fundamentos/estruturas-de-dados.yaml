@@ -1,0 +1,127 @@
+source: "Fundamentos/Estruturas de Dados.md"
+source_hash: "6cdcf1fdd73c"
+deck: "Codex::Fundamentos"
+generated: "2026-04-13"
+tags:
+  - fundamentos
+  - entrevista
+
+cards:
+  - id: fund-ed-001
+    type: basic
+    front: "Quais as 3 dimensões para comparar estruturas de dados?"
+    back: |
+      1. Tempo — complexidade das operações (Big O)
+      2. Espaço — memória consumida e overhead por elemento
+      3. Ordem — mantém ordem de inserção? natural? nenhuma?
+    tags: [estruturas-de-dados, conceitos]
+
+  - id: fund-ed-002
+    type: basic
+    front: "Por que ArrayList quase sempre vence LinkedList em Java?"
+    back: |
+      Localidade de cache. Elementos de array estão contíguos
+      em memória, permitindo prefetch eficiente da CPU.
+      LinkedList causa cache misses ao percorrer nós espalhados.
+      LinkedList só vence com inserção/remoção frequente por
+      referência direta ao nó.
+    tags: [estruturas-de-dados, arrays, listas]
+
+  - id: fund-ed-003
+    type: cloze
+    text: "Em Java, ao usar objetos como chave de HashMap, se você sobrescreve {{c1::equals}}, deve {{c2::sempre sobrescrever hashCode}} também."
+    tags: [estruturas-de-dados, hash-tables]
+
+  - id: fund-ed-004
+    type: basic
+    front: "Qual a diferença entre HashMap, LinkedHashMap e TreeMap?"
+    back: |
+      HashMap: sem ordem, O(1). LinkedHashMap: ordem de
+      inserção ou acesso, O(1). TreeMap: ordem natural
+      (Comparable), O(log n), suporta range queries
+      (floorKey, ceilingKey, subMap).
+    tags: [estruturas-de-dados, hash-tables, arvores]
+
+  - id: fund-ed-005
+    type: pitfall
+    trap: "Usar java.util.Stack em vez de ArrayDeque"
+    why: "Stack é legacy (estende Vector, sincronizado desnecessariamente). ArrayDeque é mais rápido e recomendado como stack e queue."
+    prevention: "Use Deque<T> pilha = new ArrayDeque<>() para pilha e Queue<T> fila = new ArrayDeque<>() para fila."
+    tags: [estruturas-de-dados, armadilhas, java]
+
+  - id: fund-ed-006
+    type: cloze
+    text: "PriorityQueue em Java é um {{c1::min-heap}} por padrão. Para max-heap, passe {{c2::Comparator.reverseOrder()}}."
+    tags: [estruturas-de-dados, heap]
+
+  - id: fund-ed-007
+    type: scenario
+    situation: "Você precisa encontrar os K maiores elementos de uma lista de N elementos, onde N >> K."
+    question: "Qual estrutura e complexidade?"
+    answer: "Min-heap de tamanho K. Itere a lista: se elemento > topo do heap, poll e offer. Complexidade O(n log k) em vez de O(n log n) de sort completo."
+    tags: [estruturas-de-dados, heap, entrevista]
+
+  - id: fund-ed-008
+    type: basic
+    front: "Quando usar lista de adjacência vs matriz de adjacência para grafos?"
+    back: |
+      Lista de adjacência em 99% dos casos — espaço O(V+E),
+      eficiente para grafos esparsos. Matriz de adjacência
+      só para grafos densos ou quando verificar existência
+      de aresta específica é operação dominante (O(1)).
+    tags: [estruturas-de-dados, grafos]
+
+  - id: fund-ed-009
+    type: vocab
+    term_pt: "Tabela hash"
+    term_en: "Hash table / hash map"
+    definition: "Data structure providing O(1) average-time insert, delete, and lookup by mapping keys through a hash function to array buckets."
+    usage: "I'd use a hash map to store complements for the two-sum problem, reducing it from O(n²) to O(n)."
+    tags: [estruturas-de-dados, vocabulario]
+
+  - id: fund-ed-010
+    type: vocab
+    term_pt: "Fila de prioridade"
+    term_en: "Priority queue"
+    definition: "A queue where elements are dequeued by priority (highest or lowest) rather than insertion order, typically implemented as a binary heap."
+    usage: "For Dijkstra's algorithm, I'd use a priority queue to always expand the nearest unvisited vertex."
+    tags: [estruturas-de-dados, vocabulario]
+
+  - id: fund-ed-011
+    type: basic
+    front: "O que é um Bloom Filter e quando usá-lo?"
+    back: |
+      Estrutura probabilística: responde "pode estar" ou
+      "definitivamente não está" no conjunto. Falsos positivos
+      sim, falsos negativos não. Usar para evitar queries
+      caras ("esse ID existe?"), caches distribuídos, crawlers.
+    tags: [estruturas-de-dados, especializada]
+
+  - id: fund-ed-012
+    type: cloze
+    text: "B-Trees são árvores multi-way otimizadas para {{c1::armazenamento em disco}}. É a estrutura que {{c2::indexa bancos de dados}} como PostgreSQL e MySQL."
+    tags: [estruturas-de-dados, arvores]
+
+  - id: fund-ed-013
+    type: pitfall
+    trap: "Mutar um objeto usado como chave de HashMap"
+    why: "O hash muda após mutação e a entrada fica 'perdida' — o HashMap não encontra mais a chave no bucket correto."
+    prevention: "Use objetos imutáveis como chave (String, record, final fields) e nunca dependa de campos mutáveis no hashCode."
+    tags: [estruturas-de-dados, armadilhas, hash-tables]
+
+  - id: fund-ed-014
+    type: basic
+    front: "Qual a diferença entre Trie e HashMap para busca de strings?"
+    back: |
+      HashMap: O(1) lookup de string exata. Trie: O(L) para
+      busca por prefixo, autocomplete e verificação de
+      dicionário (L = tamanho da string). Trie brilha quando
+      o padrão de acesso é por prefixo, não por chave exata.
+    tags: [estruturas-de-dados, trie]
+
+  - id: fund-ed-015
+    type: scenario
+    situation: "Seu enunciado menciona 'parênteses balanceados' ou 'parsing de expressão'."
+    question: "Qual estrutura usar?"
+    answer: "Stack (pilha). Empilhe cada abertura, desempilhe ao encontrar o fechamento correspondente. Se a pilha ficar vazia prematuramente ou sobrar elementos, não é balanceado."
+    tags: [estruturas-de-dados, stack, entrevista]

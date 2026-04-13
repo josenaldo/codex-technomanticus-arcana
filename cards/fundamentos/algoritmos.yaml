@@ -1,0 +1,125 @@
+source: "Fundamentos/Algoritmos.md"
+source_hash: "c3ec58547b7a"
+deck: "Codex::Fundamentos"
+generated: "2026-04-13"
+tags:
+  - fundamentos
+  - entrevista
+
+cards:
+  - id: fund-algo-001
+    type: basic
+    front: "Quais são as três propriedades fundamentais de um algoritmo?"
+    back: |
+      1. Correção — resultado certo para todas as entradas válidas
+      2. Complexidade — consumo de tempo e espaço em função da entrada
+      3. Generalidade — funciona para uma classe de problemas, não só um caso
+    tags: [algoritmos, conceitos]
+
+  - id: fund-algo-002
+    type: cloze
+    text: "Big O descreve o {{c1::comportamento assintótico}} — como o tempo ou espaço crescem conforme a entrada cresce, ignorando {{c2::constantes e termos menores}}."
+    tags: [algoritmos, complexidade]
+
+  - id: fund-algo-003
+    type: basic
+    front: "Qual a diferença entre análise amortizada e caso médio?"
+    back: |
+      Caso médio é sobre inputs típicos. Amortizada é sobre
+      o custo médio de uma operação ao longo de muitas execuções,
+      mesmo que individualmente uma seja cara (ex: ArrayList.add
+      é O(1) amortizado — o resize O(n) se distribui).
+    tags: [algoritmos, complexidade]
+
+  - id: fund-algo-004
+    type: cloze
+    text: "HashMap é O(1) {{c1::caso médio}}, mas O(n) no {{c2::pior caso}} quando todas as chaves colidem."
+    tags: [algoritmos, complexidade]
+
+  - id: fund-algo-005
+    type: basic
+    front: "O que significa um sort ser estável?"
+    back: |
+      Elementos com chave igual mantêm a ordem relativa
+      original. Importante para sorts encadeados (ex: ordenar
+      por nome e depois por idade sem perder a ordem por nome).
+    tags: [algoritmos, sorting]
+
+  - id: fund-algo-006
+    type: pitfall
+    trap: "Usar .sort() em JS sem comparator para ordenar números"
+    why: "[10, 2, 1].sort() retorna [1, 10, 2] — sem comparator, JS converte para string e ordena lexicograficamente."
+    prevention: "Sempre passe (a, b) => a - b para ordenação numérica."
+    tags: [algoritmos, armadilhas, javascript]
+
+  - id: fund-algo-007
+    type: basic
+    front: "Qual o template de binary search que evita overflow no cálculo do mid?"
+    back: |
+      mid = left + (right - left) / 2
+      Em vez de (left + right) / 2, que pode estourar
+      se left e right forem grandes.
+    tags: [algoritmos, busca]
+
+  - id: fund-algo-008
+    type: scenario
+    situation: "Você precisa encontrar o menor X que satisfaz uma propriedade monotônica em um espaço de respostas."
+    question: "Qual técnica usar?"
+    answer: "Binary search no espaço de respostas. Se P(X) é monotônica (false...false...true...true), basta buscar o ponto de transição em O(log n)."
+    tags: [algoritmos, busca]
+
+  - id: fund-algo-009
+    type: cloze
+    text: "DP aplica-se quando o problema tem {{c1::subestrutura ótima}} e {{c2::subproblemas sobrepostos}}."
+    tags: [algoritmos, dp]
+
+  - id: fund-algo-010
+    type: basic
+    front: "Quais são os 5 passos para abordar um problema de DP?"
+    back: |
+      1. Definir o estado (o que dp[i] representa)
+      2. Definir a transição (como dp[i] se calcula)
+      3. Definir o caso base
+      4. Definir a resposta final
+      5. Otimizar espaço se possível
+    tags: [algoritmos, dp]
+
+  - id: fund-algo-011
+    type: pitfall
+    trap: "Usar greedy sem prova de corretude"
+    why: "Greedy funciona em interval scheduling e Dijkstra, mas falha em coin change com moedas arbitrárias (1,3,4 e alvo 6: guloso dá 4+1+1 quando 3+3 é melhor)."
+    prevention: "Se não consegue provar com exchange argument, use DP como fallback seguro."
+    tags: [algoritmos, armadilhas, greedy]
+
+  - id: fund-algo-012
+    type: basic
+    front: "Qual a diferença fundamental entre BFS e DFS em grafos?"
+    back: |
+      BFS usa fila, explora em camadas — encontra caminho
+      mais curto em grafos não-ponderados. DFS usa pilha
+      (ou recursão), mergulha fundo — útil para detecção
+      de ciclos, topological sort e componentes conexos.
+    tags: [algoritmos, grafos]
+
+  - id: fund-algo-013
+    type: vocab
+    term_pt: "Programação dinâmica"
+    term_en: "Dynamic programming (DP)"
+    definition: "Optimization technique that solves problems by breaking them into overlapping subproblems, storing results to avoid redundant computation."
+    usage: "This problem has optimal substructure and overlapping subproblems, so I'd use dynamic programming."
+    tags: [algoritmos, vocabulario]
+
+  - id: fund-algo-014
+    type: vocab
+    term_pt: "Janela deslizante"
+    term_en: "Sliding window"
+    definition: "Technique that maintains a contiguous window over an array/string, sliding it to process subarrays in O(n) instead of O(n×k)."
+    usage: "I'd use a sliding window to find the maximum sum subarray of size k."
+    tags: [algoritmos, vocabulario]
+
+  - id: fund-algo-015
+    type: scenario
+    situation: "Em uma entrevista, você recebe um problema e imediatamente vê a solução ótima."
+    question: "Deve pular direto para o código?"
+    answer: "Não. Declare o brute force primeiro e sua complexidade — mostra que entendeu o problema. Depois proponha a otimização comparando complexidades. Comunicação importa mais que velocidade."
+    tags: [algoritmos, entrevista]

@@ -1,0 +1,133 @@
+source: "Fundamentos/Testes.md"
+source_hash: "581fba03116d"
+deck: "Codex::Fundamentos"
+generated: "2026-04-13"
+tags:
+  - fundamentos
+  - entrevista
+
+cards:
+  - id: fund-test-001
+    type: basic
+    front: "Quais as 4 funções estratégicas dos testes automatizados?"
+    back: |
+      1. Dar velocidade — permite refatorar sem medo
+      2. Documentar comportamento — testes são spec executável
+      3. Dar confiança em deploys — base para CI/CD
+      4. Forçar bom design — código difícil de testar é mal desenhado
+    tags: [testes, conceitos]
+
+  - id: fund-test-002
+    type: cloze
+    text: "A pirâmide de testes: muitos testes {{c1::unitários}} (rápidos) na base, moderados de {{c2::integração}} no meio, poucos E2E (lentos, frágeis) no topo."
+    tags: [testes, estrategia]
+
+  - id: fund-test-003
+    type: basic
+    front: "Qual a diferença entre Mock e Stub?"
+    back: |
+      Stub: retorna valores pré-definidos, teste verifica
+      estado final ("o objeto ficou como esperado?").
+      Mock: verifica chamadas e interações ("a classe chamou
+      emailService.send() corretamente?"). Prefira state-based
+      (stub/fake) a interaction-based (mock).
+    tags: [testes, test-doubles]
+
+  - id: fund-test-004
+    type: pitfall
+    trap: "Usar Thread.sleep() em testes assíncronos"
+    why: "Sleep fixo é flaky: muito curto e falha em CI lento, muito longo e desperdiça tempo. Não é determinístico."
+    prevention: "Use Awaitility: await().atMost(5, SECONDS).until(() -> condição). Espera pela condição, não por tempo fixo."
+    tags: [testes, armadilhas, flaky]
+
+  - id: fund-test-005
+    type: basic
+    front: "O que é o padrão AAA em testes?"
+    back: |
+      Arrange — preparar dados e dependências
+      Act — executar a ação sendo testada
+      Assert — verificar o resultado esperado
+      Equivalente BDD: Given-When-Then. Cada teste deve
+      ter uma razão clara para falhar.
+    tags: [testes, boas-praticas]
+
+  - id: fund-test-006
+    type: scenario
+    situation: "Sua suíte tem 3 testes flaky por race condition em código assíncrono."
+    question: "Como resolver?"
+    answer: "Quarentena imediata dos flaky. Substituir Thread.sleep por Awaitility. Para estado compartilhado, isolar cada teste com cleanup. Para rede externa, usar WireMock/MockWebServer."
+    tags: [testes, flaky, entrevista]
+
+  - id: fund-test-007
+    type: cloze
+    text: "TDD segue o ciclo {{c1::Red}} (teste falha) → {{c2::Green}} (mínimo código que passa) → {{c1::Refactor}} (melhora mantendo verde)."
+    tags: [testes, tdd]
+
+  - id: fund-test-008
+    type: basic
+    front: "Quando TDD brilha e quando atrapalha?"
+    back: |
+      Brilha: lógica de negócio complexa, bug fixing
+      (teste que reproduz bug primeiro), API pública,
+      refactoring. Atrapalha: exploração/prototipagem,
+      código declarativo, UIs visuais, glue code trivial.
+    tags: [testes, tdd]
+
+  - id: fund-test-009
+    type: pitfall
+    trap: "Testar implementação em vez de comportamento"
+    why: "verify(repo).findById(1L); verify(repo).save(any()) — se refatorar mantendo comportamento, teste quebra. Acoplou à implementação."
+    prevention: "Verifique estado final (assertThat(result.getName()).isEqualTo(...)). Se refatorar sem mudar comportamento e teste quebrar, o teste está errado."
+    tags: [testes, armadilhas, boas-praticas]
+
+  - id: fund-test-010
+    type: basic
+    front: "Por que 100% de code coverage é uma métrica enganosa?"
+    back: |
+      Um teste pode executar uma linha sem verificar nada
+      (zero assertions). Coverage incentiva testes inúteis
+      para bater meta. Foque em 70-85%, priorizando branch
+      coverage em lógica de negócio. Combine com mutation
+      testing (PITest) para validar qualidade real.
+    tags: [testes, coverage]
+
+  - id: fund-test-011
+    type: vocab
+    term_pt: "Teste de contrato"
+    term_en: "Contract test"
+    definition: "Test that verifies two services agree on the shape of their messages without requiring both to run together."
+    usage: "We use Pact contract tests between our API gateway and backend services to catch breaking changes early."
+    tags: [testes, vocabulario]
+
+  - id: fund-test-012
+    type: vocab
+    term_pt: "Teste intermitente"
+    term_en: "Flaky test"
+    definition: "A test that sometimes passes and sometimes fails without any code change, destroying confidence in the test suite."
+    usage: "A flaky test is worse than no test — it trains the team to ignore failures."
+    tags: [testes, vocabulario]
+
+  - id: fund-test-013
+    type: basic
+    front: "Quais são as propriedades F.I.R.S.T de bons testes?"
+    back: |
+      Fast — milissegundos
+      Independent — rodam em qualquer ordem
+      Repeatable — mesmo resultado em qualquer ambiente
+      Self-validating — passa ou falha, sem inspeção manual
+      Timely — escritos no momento certo (TDD)
+    tags: [testes, boas-praticas]
+
+  - id: fund-test-014
+    type: scenario
+    situation: "Você precisa testar um repository JPA que faz queries SQL complexas."
+    question: "Unit test com mock ou integration test?"
+    answer: "Integration test com Testcontainers (PostgreSQL real). Mock do repository não valida o SQL gerado — bugs de query só aparecem com banco real. Use @DataJpaTest + Testcontainers."
+    tags: [testes, integracao, entrevista]
+
+  - id: fund-test-015
+    type: pitfall
+    trap: "Over-mocking: mockar todas as dependências"
+    why: "Acaba testando os mocks, não o código. Testes ficam frágeis e quebram em qualquer refactor sem pegar bugs reais."
+    prevention: "Prefira Fakes (InMemoryRepository com HashMap) para dependências de persistência. Reserve mocks para verificar interações essenciais (notificação enviada?)."
+    tags: [testes, armadilhas, test-doubles]

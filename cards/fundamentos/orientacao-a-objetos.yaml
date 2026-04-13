@@ -1,0 +1,130 @@
+source: "Fundamentos/Orientação a Objetos.md"
+source_hash: "23415cf80c33"
+deck: "Codex::Fundamentos"
+generated: "2026-04-13"
+tags:
+  - fundamentos
+  - entrevista
+
+cards:
+  - id: fund-oo-001
+    type: basic
+    front: "Quais são os 4 pilares da Orientação a Objetos?"
+    back: |
+      1. Encapsulamento — esconder estado, expor interface pública
+      2. Herança — subclasse herda atributos/métodos da superclasse
+      3. Polimorfismo — objetos diferentes respondem à mesma interface
+      4. Abstração — modelar pelo que faz, não como faz
+    tags: [oop, conceitos]
+
+  - id: fund-oo-002
+    type: pitfall
+    trap: "Expor tudo via getters/setters públicos achando que é encapsulamento"
+    why: "Se qualquer um pode fazer conta.setSaldo(valor), você não tem invariantes protegidas. É encapsulamento falso."
+    prevention: "Exponha comportamentos (conta.sacar(valor)) em vez de estado. A lógica de validação vive dentro do método."
+    tags: [oop, armadilhas, encapsulamento]
+
+  - id: fund-oo-003
+    type: cloze
+    text: "O princípio SRP (Single Responsibility) diz que uma classe deve ter {{c1::uma única razão para mudar}} — não 'uma única função', mas um único {{c2::eixo de mudança}}."
+    tags: [oop, solid]
+
+  - id: fund-oo-004
+    type: basic
+    front: "O que é o Liskov Substitution Principle (LSP) e qual o exemplo clássico de violação?"
+    back: |
+      Subtipos devem ser substituíveis pelo tipo base sem
+      quebrar comportamento. Violação clássica: Rectangle →
+      Square. Se código espera setWidth e setHeight
+      independentes, Square que sincroniza ambos quebra
+      o contrato.
+    tags: [oop, solid]
+
+  - id: fund-oo-005
+    type: basic
+    front: "Por que preferir composição sobre herança em OOP moderna?"
+    back: |
+      Herança cria acoplamento forte (fragile base class),
+      hierarquia rígida (herança única), dificulta testes.
+      Composição permite trocar comportamento injetando
+      colaboradores, é flexível e testável. Herança só
+      para relações is-a reais e estáveis.
+    tags: [oop, composicao]
+
+  - id: fund-oo-006
+    type: cloze
+    text: "DIP (Dependency Inversion): módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de {{c1::abstrações (interfaces)}}. Isto é a base de {{c2::Dependency Injection}}."
+    tags: [oop, solid]
+
+  - id: fund-oo-007
+    type: scenario
+    situation: "Você tem uma entidade Pedido com toda lógica de negócio em PedidoService, e a entidade só tem getters/setters."
+    question: "Qual anti-pattern é esse e como corrigir?"
+    answer: "Anemic Domain Model. Mova regras para dentro da entidade: Pedido.aprovar() valida e muda status internamente. O service apenas orquestra (busca, delega, persiste)."
+    tags: [oop, ddd, entrevista]
+
+  - id: fund-oo-008
+    type: basic
+    front: "Qual a diferença entre Entity e Value Object em DDD?"
+    back: |
+      Entity tem identidade — dois Users com mesmo nome são
+      diferentes se IDs diferem. Mutável. Value Object não
+      tem identidade — dois Money(10, BRL) são iguais.
+      Imutável por regra. Em Java 14+, record é natural
+      para value objects.
+    tags: [oop, ddd]
+
+  - id: fund-oo-009
+    type: pitfall
+    trap: "Criar interface com uma única implementação 'para o futuro'"
+    why: "Viola YAGNI (You Ain't Gonna Need It). Adiciona complexidade sem benefício concreto."
+    prevention: "Crie a interface quando a segunda implementação aparecer ou quando for necessário para testes."
+    tags: [oop, armadilhas]
+
+  - id: fund-oo-010
+    type: vocab
+    term_pt: "Inversão de dependência"
+    term_en: "Dependency inversion"
+    definition: "Principle where high-level modules depend on abstractions rather than concrete implementations, enabling flexibility and testability."
+    usage: "With dependency inversion, I can swap the real payment gateway for a fake in tests without changing the service."
+    tags: [oop, vocabulario]
+
+  - id: fund-oo-011
+    type: vocab
+    term_pt: "Modelo de domínio rico"
+    term_en: "Rich domain model"
+    definition: "Design where domain entities contain both data and the business rules that govern them, as opposed to anemic entities with only getters/setters."
+    usage: "In our rich domain model, the Order entity knows whether it can be approved based on its own state."
+    tags: [oop, vocabulario, ddd]
+
+  - id: fund-oo-012
+    type: basic
+    front: "O que é a Lei de Demeter e como corrigir uma violação?"
+    back: |
+      "Fale apenas com amigos imediatos." Evite cadeias como
+      pedido.getCliente().getEndereco().getCep() — isso vaza
+      estrutura interna. Corrija expondo o que o cliente
+      precisa: pedido.getCepDeEntrega().
+    tags: [oop, design]
+
+  - id: fund-oo-013
+    type: cloze
+    text: "Bom design OOP = {{c1::baixo acoplamento}} (módulos independentes) + {{c2::alta coesão}} (responsabilidades relacionadas juntas)."
+    tags: [oop, design]
+
+  - id: fund-oo-014
+    type: scenario
+    situation: "Em entrevista, pedem 'quando herança é adequada'."
+    question: "Quais os casos válidos?"
+    answer: "Hierarquia de domínio real e estável (Payment → CreditCardPayment), Template Method pattern, extensão de frameworks (JpaRepository), e value objects imutáveis. Manter hierarquias rasas (2-3 níveis máx)."
+    tags: [oop, heranca, entrevista]
+
+  - id: fund-oo-015
+    type: basic
+    front: "O que é 'Tell, Don't Ask' em OOP?"
+    back: |
+      Não pergunte estado de um objeto para decidir — diga
+      ao objeto o que fazer. Em vez de if(pedido.getStatus()
+      == PENDENTE) { pedido.setStatus(APROVADO) }, use
+      pedido.aprovar(). Mantém lógica junto dos dados.
+    tags: [oop, design]
