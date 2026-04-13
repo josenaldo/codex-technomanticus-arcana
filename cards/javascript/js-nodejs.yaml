@@ -1,0 +1,109 @@
+source: "JavaScript/Backend/Node.js.md"
+source_hash: "322e28e86d98"
+deck: "Codex::JavaScript"
+generated: "2026-04-13"
+tags:
+  - javascript
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+  - id: js-nodejs-001
+    type: basic
+    front: "What two core components make up the Node.js architecture beneath the Node bindings?"
+    back: "V8 engine (compiles JS to native code via JIT) and libuv (provides the event loop, thread pool, async I/O, and cross-platform networking/timers)."
+    tags: [javascript, nodejs, architecture]
+
+  - id: js-nodejs-002
+    type: basic
+    front: "What is the default size of the libuv thread pool in Node.js, and what operations use it?"
+    back: "4 threads (configurable via UV_THREADPOOL_SIZE). Used for filesystem ops, DNS lookups, crypto, and compression — tasks the OS cannot do asynchronously."
+    tags: [javascript, nodejs, libuv, threadpool]
+
+  - id: js-nodejs-003
+    type: basic
+    front: "List the 6 phases of the Node.js event loop in order."
+    back: "timers -> pending callbacks -> idle/prepare -> poll -> check -> close callbacks. Microtasks (process.nextTick, then Promise.then) run between every phase."
+    tags: [javascript, nodejs, eventloop]
+
+  - id: js-nodejs-004
+    type: basic
+    front: "Why should you use stream.pipeline() instead of .pipe() in Node.js?"
+    back: "pipeline() propagates errors and automatically cleans up (closes) all streams on failure. With .pipe(), errors are not propagated — downstream streams can leak if upstream fails."
+    tags: [javascript, nodejs, streams]
+
+  - id: js-nodejs-005
+    type: basic
+    front: "When should you use Worker Threads vs Cluster vs child_process in Node.js?"
+    back: "Worker Threads for CPU-bound tasks (fast creation, shared memory). Cluster for scaling HTTP servers across CPU cores. child_process for running external shell commands or isolated Node processes."
+    tags: [javascript, nodejs, parallelism]
+
+  # === CLOZE (3) ===
+  - id: js-nodejs-006
+    type: cloze
+    text: "In the Node.js event loop, {{c1::process.nextTick}} has the highest priority among microtasks, executing before {{c2::Promise.then}} callbacks between phases."
+    tags: [javascript, nodejs, eventloop, microtasks]
+
+  - id: js-nodejs-007
+    type: cloze
+    text: "Node.js Streams have 4 types: {{c1::Readable}}, Writable, {{c2::Transform}}, and Duplex."
+    tags: [javascript, nodejs, streams]
+
+  - id: js-nodejs-008
+    type: cloze
+    text: "In Node 22+, you can run TypeScript natively using {{c1::--experimental-strip-types}}, which removes type annotations and runs the resulting JS without needing ts-node or tsx."
+    tags: [javascript, nodejs, typescript, modern]
+
+  # === VOCAB (2) ===
+  - id: js-nodejs-009
+    type: vocab
+    term_pt: "laço de eventos"
+    term_en: "event loop"
+    definition: "The mechanism in Node.js (via libuv) that processes async callbacks in phases, enabling non-blocking I/O on a single thread."
+    usage: "The event loop is what allows Node.js to handle thousands of concurrent connections without spawning threads."
+    tags: [javascript, nodejs, eventloop, vocab]
+
+  - id: js-nodejs-010
+    type: vocab
+    term_pt: "contrapressão"
+    term_en: "backpressure"
+    definition: "Flow control mechanism where a slow consumer signals a fast producer to pause, preventing buffer overflow in streams."
+    usage: "When writing to a stream, check if write() returns false and wait for the 'drain' event to handle backpressure."
+    tags: [javascript, nodejs, streams, vocab]
+
+  # === SCENARIO (2) ===
+  - id: js-nodejs-011
+    type: scenario
+    situation: "Your Node.js API server suddenly shows high latency on all endpoints. CPU usage on the single-core container is near 100%."
+    question: "What is the likely cause and how do you fix it?"
+    answer: "A CPU-intensive operation is blocking the event loop (e.g., large JSON.parse, sync crypto). Move it to a Worker Thread or offload to a separate service. Use monitorEventLoopDelay to diagnose."
+    tags: [javascript, nodejs, eventloop, performance]
+
+  - id: js-nodejs-012
+    type: scenario
+    situation: "You need to process a 10GB CSV file on a Node.js server with 512MB RAM."
+    question: "What approach should you use?"
+    answer: "Use Streams with pipeline(): createReadStream -> Transform (parse lines) -> createWriteStream. Streams process data in chunks without loading the entire file into memory."
+    tags: [javascript, nodejs, streams]
+
+  # === PITFALL (3) ===
+  - id: js-nodejs-013
+    type: pitfall
+    trap: "Using recursive process.nextTick() calls in Node.js."
+    why: "nextTick runs before the event loop advances to the next phase. Recursive nextTick starves I/O callbacks, timers, and everything else — the loop never progresses."
+    prevention: "Use setImmediate() for recursive async work. It runs in the check phase, allowing other phases to execute between iterations."
+    tags: [javascript, nodejs, eventloop, pitfall]
+
+  - id: js-nodejs-014
+    type: pitfall
+    trap: "Not catching async errors in Express route handlers."
+    why: "Express does not automatically catch promise rejections. An unhandled rejection in an async handler crashes the process or returns no response."
+    prevention: "Wrap async handlers with asyncHandler that calls .catch(next), or use Express 5+ which handles async errors natively."
+    tags: [javascript, nodejs, express, errorhandling, pitfall]
+
+  - id: js-nodejs-015
+    type: pitfall
+    trap: "Using an in-memory Map as a cache without TTL or size limits in a Node.js server."
+    why: "The Map grows indefinitely, causing a memory leak. Node's garbage collector cannot reclaim entries that are still referenced."
+    prevention: "Use LRUCache with max size and TTL, or an external cache like Redis."
+    tags: [javascript, nodejs, memoryleak, pitfall]

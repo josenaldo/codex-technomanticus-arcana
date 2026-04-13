@@ -1,0 +1,123 @@
+source: "JavaScript/Core/Testes em JavaScript.md"
+source_hash: "4902038129f3"
+deck: "Codex::JavaScript"
+generated: "2026-04-13"
+tags:
+  - javascript
+  - entrevista
+
+cards:
+  - id: js-testing-001
+    type: basic
+    front: "Quais as principais vantagens do Vitest sobre o Jest?"
+    back: |
+      Vitest é 3-10x mais rápido, tem suporte nativo a ESM e
+      TypeScript sem config, API compatível com Jest, e integração
+      com Vite. É a escolha padrão para projetos novos.
+    tags: [vitest, jest, comparacao]
+
+  - id: js-testing-002
+    type: basic
+    front: "Qual a diferença entre vi.fn(), vi.spyOn() e vi.mock() no Vitest?"
+    back: |
+      vi.fn(): cria mock function isolada. vi.spyOn(): observa
+      método existente sem substituir (pode ser mockado depois).
+      vi.mock(): substitui módulo inteiro, com importOriginal
+      para mock parcial.
+    tags: [vitest, mocks]
+
+  - id: js-testing-003
+    type: basic
+    front: "Qual a prioridade de queries recomendada pelo Testing Library?"
+    back: |
+      1. getByRole (acessibilidade)
+      2. getByLabelText (formulários)
+      3. getByText (conteúdo visível)
+      4. getByTestId (último recurso)
+      Testar o que o usuário vê, não a implementação.
+    tags: [testinglibrary, queries]
+
+  - id: js-testing-004
+    type: basic
+    front: "Qual a diferença entre getBy, queryBy e findBy no Testing Library?"
+    back: |
+      getBy: retorna elemento ou lança erro se não encontrar.
+      queryBy: retorna null se não encontrar (útil para assert
+      ausência). findBy: retorna Promise, espera elemento aparecer
+      (assíncrono, usa waitFor internamente).
+    tags: [testinglibrary, queries]
+
+  - id: js-testing-005
+    type: basic
+    front: "O que é MSW (Mock Service Worker) e por que é melhor que mockar fetch?"
+    back: |
+      MSW intercepta requisições no nível de rede, não substituindo
+      fetch/axios. Testa o código real de requisição, funciona em
+      testes e dev, e permite overrides por teste com server.use().
+    tags: [msw, mocks, api]
+
+  - id: js-testing-006
+    type: cloze
+    text: "No Testing Library, {{c1::getByRole}} é a query de maior prioridade porque reflete como tecnologias assistivas e usuários interagem com a página."
+    tags: [testinglibrary, acessibilidade]
+
+  - id: js-testing-007
+    type: cloze
+    text: "No Vitest, {{c1::mockResolvedValue}} define o valor de resolução de uma Promise mockada, enquanto {{c2::mockReturnValue}} define o retorno síncrono."
+    tags: [vitest, mocks]
+
+  - id: js-testing-008
+    type: cloze
+    text: "Playwright usa {{c1::auto-wait}} para aguardar elementos automaticamente antes de interagir, eliminando a necessidade de sleeps manuais nos testes E2E."
+    tags: [playwright, e2e]
+
+  - id: js-testing-009
+    type: vocab
+    term_pt: "Teste de ponta a ponta"
+    term_en: "End-to-end (E2E) testing"
+    definition: "Testing that exercises the full application stack through a real browser, simulating actual user flows from start to finish."
+    usage: "We use Playwright for end-to-end testing of our critical checkout flow."
+    tags: [playwright, vocabulario]
+
+  - id: js-testing-010
+    type: vocab
+    term_pt: "Modelo de objetos de página"
+    term_en: "Page Object Model (POM)"
+    definition: "Design pattern for E2E tests that encapsulates page interactions into reusable classes, reducing duplication and improving test maintainability."
+    usage: "Each page has a Page Object that exposes methods like login() and addToCart()."
+    tags: [playwright, vocabulario, patterns]
+
+  - id: js-testing-011
+    type: scenario
+    situation: "Um teste precisa verificar que um elemento NÃO está presente no DOM."
+    question: "Qual query do Testing Library usar?"
+    answer: "queryByRole (ou outro queryBy*) — retorna null em vez de lançar erro. Depois, expect(element).not.toBeInTheDocument(). Nunca usar getBy para assertar ausência."
+    tags: [testinglibrary, queries]
+
+  - id: js-testing-012
+    type: scenario
+    situation: "Um único endpoint precisa retornar resposta diferente em um teste específico."
+    question: "Como fazer override por teste com MSW?"
+    answer: "Usar server.use(http.get('/api/data', resolver)) dentro do teste. O override é removido automaticamente no afterEach com server.resetHandlers()."
+    tags: [msw, mocks]
+
+  - id: js-testing-013
+    type: pitfall
+    trap: "Usar querySelector ou getByTestId como query padrão nos testes"
+    why: "querySelector testa implementação (seletores CSS), não comportamento. getByTestId é melhor que querySelector mas não garante acessibilidade."
+    prevention: "Seguir a prioridade: getByRole > getByLabelText > getByText. Usar getByTestId só como último recurso."
+    tags: [testinglibrary, armadilhas]
+
+  - id: js-testing-014
+    type: pitfall
+    trap: "Usar snapshots grandes para testar componentes inteiros"
+    why: "Snapshots grandes quebram com qualquer mudança visual trivial, causando snapshot fatigue — devs aceitam updates sem revisar, perdendo o valor do teste."
+    prevention: "Preferir assertions específicas sobre comportamento. Se usar snapshot, manter pequeno e focado em output estável."
+    tags: [vitest, armadilhas, snapshots]
+
+  - id: js-testing-015
+    type: pitfall
+    trap: "Usar fireEvent em vez de userEvent no Testing Library"
+    why: "fireEvent dispara um único evento DOM. Interações reais envolvem sequências (focus, keydown, input, change). fireEvent não testa o comportamento real do browser."
+    prevention: "Usar @testing-library/user-event que simula interações completas como um usuário real faria."
+    tags: [testinglibrary, armadilhas]

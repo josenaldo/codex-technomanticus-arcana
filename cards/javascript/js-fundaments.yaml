@@ -1,0 +1,125 @@
+source: "JavaScript/Core/JavaScript Fundamentals.md"
+source_hash: "dd236b5f5443"
+deck: "Codex::JavaScript"
+generated: "2026-04-13"
+tags:
+  - javascript
+  - entrevista
+
+cards:
+  - id: js-fundaments-001
+    type: basic
+    front: "Qual a ordem de execução entre microtasks e macrotasks no event loop do JavaScript?"
+    back: |
+      Microtasks (Promises, queueMicrotask) drenam completamente
+      antes da próxima macrotask (setTimeout, I/O). Isso significa
+      que um loop infinito de microtasks causa starvation — a UI
+      trava e nenhum setTimeout executa.
+    tags: [eventloop, microtask, macrotask]
+
+  - id: js-fundaments-002
+    type: basic
+    front: "O que é uma closure em JavaScript e qual seu uso principal?"
+    back: |
+      Closure é uma função que captura variáveis do escopo léxico
+      onde foi criada, mesmo após esse escopo encerrar. Usos:
+      encapsulamento de estado privado, memoização e factory
+      functions.
+    tags: [closures, escopo]
+
+  - id: js-fundaments-003
+    type: basic
+    front: "Quais são as 5 regras de binding do `this` em JavaScript, em ordem de precedência?"
+    back: |
+      1. new binding (construtor)
+      2. Explicit binding (call/apply/bind)
+      3. Implicit binding (obj.method())
+      4. Default binding (global ou undefined em strict)
+      5. Arrow function (herda this léxico, ignora as demais)
+    tags: [this, binding]
+
+  - id: js-fundaments-004
+    type: basic
+    front: "Qual a diferença entre var, let e const quanto a escopo e hoisting?"
+    back: |
+      var: function-scoped, hoisted com valor undefined.
+      let/const: block-scoped, hoisted mas em TDZ (Temporal
+      Dead Zone) — acessar antes da declaração dá ReferenceError.
+      const impede reatribuição, mas não torna o valor imutável.
+    tags: [variaveis, hoisting, tdz]
+
+  - id: js-fundaments-005
+    type: basic
+    front: "Qual a diferença entre Promise.all, Promise.allSettled, Promise.race e Promise.any?"
+    back: |
+      all: resolve quando todas resolvem, rejeita na primeira falha.
+      allSettled: espera todas, nunca rejeita, retorna status de cada.
+      race: resolve/rejeita com a primeira a terminar.
+      any: resolve com a primeira a resolver, rejeita se todas falham.
+    tags: [promises, async]
+
+  - id: js-fundaments-006
+    type: cloze
+    text: "No event loop, a call stack executa código síncrono, depois drena todas as {{c1::microtasks}}, e só então processa a próxima {{c2::macrotask}}."
+    tags: [eventloop, microtask]
+
+  - id: js-fundaments-007
+    type: cloze
+    text: "O bug clássico de closure com var em loop ocorre porque var é {{c1::function-scoped}} — todas as iterações compartilham a mesma variável. A solução é usar {{c2::let}} ou um IIFE."
+    tags: [closures, armadilhas]
+
+  - id: js-fundaments-008
+    type: cloze
+    text: "Em JavaScript, {{c1::typeof null}} retorna \"object\" — um bug histórico da linguagem que nunca foi corrigido por questões de compatibilidade."
+    tags: [coercao, tipos]
+
+  - id: js-fundaments-009
+    type: vocab
+    term_pt: "Zona Morta Temporal"
+    term_en: "Temporal Dead Zone (TDZ)"
+    definition: "Period between entering a block scope and the let/const declaration being reached, where accessing the variable throws ReferenceError."
+    usage: "You can't use that variable yet — it's still in the temporal dead zone."
+    tags: [variaveis, vocabulario]
+
+  - id: js-fundaments-010
+    type: vocab
+    term_pt: "Coerção de tipos"
+    term_en: "Type coercion"
+    definition: "Implicit conversion between types in JS. The == operator coerces, while === checks type and value without conversion."
+    usage: "This comparison uses loose equality, so type coercion converts the string to a number."
+    tags: [coercao, vocabulario]
+
+  - id: js-fundaments-011
+    type: scenario
+    situation: "Você precisa buscar dados de 5 endpoints independentes no carregamento de uma página."
+    question: "Qual o anti-pattern a evitar e a solução correta?"
+    answer: "Evitar await sequencial (await fetch1; await fetch2...) que serializa. Usar Promise.all([fetch1(), fetch2()...]) para paralelizar as chamadas."
+    tags: [promises, async, performance]
+
+  - id: js-fundaments-012
+    type: scenario
+    situation: "Você precisa armazenar metadados sobre objetos DOM sem causar memory leaks."
+    question: "Qual estrutura usar e por quê?"
+    answer: "WeakMap — as chaves são referências fracas. Quando o objeto DOM é removido, o garbage collector libera a entrada automaticamente, prevenindo vazamento de memória."
+    tags: [weakmap, gc, memoria]
+
+  - id: js-fundaments-013
+    type: pitfall
+    trap: "Usar == em vez de === para comparações"
+    why: "== aplica coerção de tipos: '' == 0 é true, null == undefined é true, [] == false é true. Resultados contra-intuitivos geram bugs sutis."
+    prevention: "Sempre usar === e !==. Lint rules (eqeqeq) ajudam a reforçar."
+    tags: [coercao, armadilhas]
+
+  - id: js-fundaments-014
+    type: pitfall
+    trap: "Assumir que const torna objetos imutáveis"
+    why: "const impede reatribuição da referência, mas as propriedades do objeto podem ser alteradas livremente. const obj = {}; obj.x = 1 funciona."
+    prevention: "Para imutabilidade real, use Object.freeze() ou structuredClone() para cópias profundas."
+    tags: [variaveis, armadilhas]
+
+  - id: js-fundaments-015
+    type: pitfall
+    trap: "Confiar que [] é falsy em condições"
+    why: "Arrays vazios são truthy em JS. if ([]) é true. Mas [] == false é true por coerção. Essa inconsistência confunde devs de outras linguagens."
+    prevention: "Checar array vazio com arr.length === 0, nunca com !arr."
+    tags: [coercao, armadilhas]

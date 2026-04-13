@@ -1,0 +1,125 @@
+source: "JavaScript/Core/TypeScript.md"
+source_hash: "6ecc9a8229df"
+deck: "Codex::JavaScript"
+generated: "2026-04-13"
+tags:
+  - javascript
+  - entrevista
+
+cards:
+  - id: js-typescript-001
+    type: basic
+    front: "O que significa TypeScript usar tipagem estrutural em vez de nominal?"
+    back: |
+      Compatibilidade é determinada pela estrutura (propriedades
+      e métodos), não pelo nome do tipo. Se dois tipos têm a mesma
+      forma, são compatíveis — semelhante a duck typing, diferente
+      de Java onde o nome da classe importa.
+    tags: [typescript, tipagem]
+
+  - id: js-typescript-002
+    type: basic
+    front: "Qual a diferença entre any, unknown e never em TypeScript?"
+    back: |
+      any: desabilita checagem de tipos completamente.
+      unknown: tipo seguro para valores desconhecidos — exige
+      narrowing antes de usar. never: tipo impossível, nenhum
+      valor pode ser never (útil para exhaustiveness check).
+    tags: [typescript, tipos]
+
+  - id: js-typescript-003
+    type: basic
+    front: "O que são discriminated unions em TypeScript e para que servem?"
+    back: |
+      Unions onde cada membro tem uma propriedade literal
+      discriminante (ex: status: "loading" | "success" | "error").
+      O TS usa essa propriedade para narrowing automático em
+      switch/if e garante exhaustiveness com never no default.
+    tags: [typescript, unions]
+
+  - id: js-typescript-004
+    type: basic
+    front: "Quais as 5 formas de type narrowing em TypeScript?"
+    back: |
+      1. typeof (primitivos)
+      2. instanceof (classes)
+      3. in operator (propriedades)
+      4. Discriminant property (literal em union)
+      5. Custom type guard (function is Type) e assertion functions
+    tags: [typescript, narrowing]
+
+  - id: js-typescript-005
+    type: basic
+    front: "Qual a diferença entre interface e type em TypeScript?"
+    back: |
+      Interface suporta declaration merging (extensível por terceiros)
+      e é melhor para contratos de objetos. Type suporta unions,
+      tuples, mapped types e tipos primitivos. Para objetos simples,
+      ambos funcionam; para unions/tuples, só type.
+    tags: [typescript, interface]
+
+  - id: js-typescript-006
+    type: cloze
+    text: "Em TypeScript, {{c1::unknown}} é o tipo seguro para valores desconhecidos porque exige narrowing antes do uso, enquanto {{c2::any}} desabilita toda checagem."
+    tags: [typescript, tipos]
+
+  - id: js-typescript-007
+    type: cloze
+    text: "O keyword {{c1::infer}} em conditional types permite extrair tipos internos — por exemplo, ReturnType usa `T extends (...args: any) => infer R ? R : never`."
+    tags: [typescript, generics]
+
+  - id: js-typescript-008
+    type: cloze
+    text: "Para garantir exhaustiveness em um switch sobre discriminated unions, o caso default deve atribuir o valor a uma variável do tipo {{c1::never}} — se um caso não foi tratado, o TS dá erro de compilação."
+    tags: [typescript, unions]
+
+  - id: js-typescript-009
+    type: vocab
+    term_pt: "Estreitamento de tipos"
+    term_en: "Type narrowing"
+    definition: "Process of refining a broad type to a more specific one within a code block using type guards like typeof, instanceof, or custom predicates."
+    usage: "After the typeof check, TypeScript narrows the type from unknown to string."
+    tags: [typescript, vocabulario]
+
+  - id: js-typescript-010
+    type: vocab
+    term_pt: "Tipos mapeados"
+    term_en: "Mapped types"
+    definition: "Types that transform each property of an existing type using keyof and index signatures, producing a new type (e.g., Partial, Readonly)."
+    usage: "I used a mapped type with keyof to make all properties optional."
+    tags: [typescript, vocabulario]
+
+  - id: js-typescript-011
+    type: scenario
+    situation: "Você precisa tipar uma função que aceita qualquer objeto com uma propriedade id numérica."
+    question: "Como usar generics com constraints?"
+    answer: "Use `function process<T extends { id: number }>(obj: T)`. O extends restringe T a tipos com id numérico, preservando o tipo completo do argumento via inferência."
+    tags: [typescript, generics]
+
+  - id: js-typescript-012
+    type: scenario
+    situation: "Uma biblioteca exporta enums para representar estados, mas o time quer evitar enums."
+    question: "Quais alternativas TypeScript existem?"
+    answer: "Union literals (`type Status = 'active' | 'inactive'`) ou `as const` objects. Ambos são eraseable em runtime, tree-shakeable e mais simples que enums."
+    tags: [typescript, enums]
+
+  - id: js-typescript-013
+    type: pitfall
+    trap: "Usar any como escape rápido para erros de tipo"
+    why: "any desliga o type checker para aquele valor e todos que derivam dele — erros se propagam silenciosamente pelo código."
+    prevention: "Usar unknown e fazer narrowing explícito. Reservar any só para migrações temporárias com TODO."
+    tags: [typescript, armadilhas]
+
+  - id: js-typescript-014
+    type: pitfall
+    trap: "Não habilitar noUncheckedIndexedAccess no tsconfig"
+    why: "Sem ela, obj[key] retorna T em vez de T | undefined, escondendo possíveis acessos a índices inexistentes em arrays e objetos."
+    prevention: "Ativar noUncheckedIndexedAccess em strict configs para forçar checagem de undefined."
+    tags: [typescript, armadilhas, config]
+
+  - id: js-typescript-015
+    type: pitfall
+    trap: "Confundir interface merging com extensão intencional"
+    why: "Duas declarações de mesma interface no mesmo escopo fazem merge automático. Libs podem acidentalmente sobrescrever propriedades da sua interface."
+    prevention: "Preferir type alias quando não precisa de merging. Usar interface só para contratos públicos extensíveis."
+    tags: [typescript, armadilhas]

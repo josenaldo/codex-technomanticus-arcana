@@ -1,0 +1,109 @@
+source: "JavaScript/Frontend/HTML e CSS.md"
+source_hash: "4b3f8764c598"
+deck: "Codex::JavaScript"
+generated: "2026-04-13"
+tags:
+  - javascript
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+  - id: js-htmlcss-001
+    type: basic
+    front: "What is the difference between content-box and border-box in CSS, and which is recommended?"
+    back: "content-box: width = content only (padding/border add to total). border-box: width includes content + padding + border. border-box is recommended via global reset: *, *::before, *::after { box-sizing: border-box; }."
+    tags: [javascript, css, boxmodel]
+
+  - id: js-htmlcss-002
+    type: basic
+    front: "When should you use CSS Flexbox vs CSS Grid?"
+    back: "Flexbox for 1-dimensional layout (row OR column): alignment, distribution, wrapping. Grid for 2-dimensional layout (rows AND columns): complex page layouts, grid areas. They complement each other."
+    tags: [javascript, css, layout, flexbox, grid]
+
+  - id: js-htmlcss-003
+    type: basic
+    front: "What is the CSS specificity order from highest to lowest?"
+    back: "Inline styles > ID selectors > class/attribute/pseudo-class selectors > element/pseudo-element selectors. !important overrides all but is bad practice. @layer can control cascade order explicitly."
+    tags: [javascript, css, specificity]
+
+  - id: js-htmlcss-004
+    type: basic
+    front: "What are container queries in CSS and how do they differ from media queries?"
+    back: "Container queries (@container) respond to a parent container's size, not the viewport. This makes components truly reusable — they adapt to their context, not the screen. Use with container-type: inline-size."
+    tags: [javascript, css, responsive, containerqueries]
+
+  - id: js-htmlcss-005
+    type: basic
+    front: "What are the 7 main semantic HTML5 structural elements and their purposes?"
+    back: "header (page/section heading), nav (navigation), main (primary content, 1 per page), article (self-contained content), section (thematic grouping), aside (sidebar/related), footer (page/section footer)."
+    tags: [javascript, html, semantics]
+
+  # === CLOZE (3) ===
+  - id: js-htmlcss-006
+    type: cloze
+    text: "The CSS function {{c1::clamp()}} enables fluid typography by setting a minimum, preferred, and maximum value — e.g., font-size: clamp(1rem, 2.5vw, 2rem)."
+    tags: [javascript, css, responsive, typography]
+
+  - id: js-htmlcss-007
+    type: cloze
+    text: "The {{c1:::has()}} pseudo-class in modern CSS acts as a parent selector, allowing you to style a parent based on its {{c2::children}} — e.g., div:has(> img) targets divs containing an image."
+    tags: [javascript, css, modern, selectors]
+
+  - id: js-htmlcss-008
+    type: cloze
+    text: "CSS {{c1::@layer}} lets you define cascade layers to control specificity order explicitly, without relying on selector weight or source order."
+    tags: [javascript, css, cascade, modern]
+
+  # === VOCAB (2) ===
+  - id: js-htmlcss-009
+    type: vocab
+    term_pt: "modelo de caixa"
+    term_en: "box model"
+    definition: "The CSS model where every element is a rectangular box composed of content, padding, border, and margin layers from inside out."
+    usage: "Understanding the box model is essential for debugging layout issues — use border-box so width includes padding and border."
+    tags: [javascript, css, boxmodel, vocab]
+
+  - id: js-htmlcss-010
+    type: vocab
+    term_pt: "acessibilidade"
+    term_en: "accessibility (a11y)"
+    definition: "Designing web content usable by everyone, including people with disabilities. Covers ARIA roles, keyboard navigation, color contrast, and semantic HTML."
+    usage: "WCAG AA requires a minimum color contrast ratio of 4.5:1 for normal text to meet accessibility standards."
+    tags: [javascript, html, accessibility, vocab]
+
+  # === SCENARIO (2) ===
+  - id: js-htmlcss-011
+    type: scenario
+    situation: "A designer gives you a responsive card grid that should show 1 column on mobile, 2 on tablet, and 3 on desktop, with cards that adapt to available space."
+    question: "What CSS approach do you use?"
+    answer: "CSS Grid with auto-fit and minmax: grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)). This auto-adjusts columns based on container width without media queries."
+    tags: [javascript, css, grid, responsive]
+
+  - id: js-htmlcss-012
+    type: scenario
+    situation: "An accessibility audit reports that screen readers cannot navigate your page's sections because every container is a div."
+    question: "How do you fix this?"
+    answer: "Replace divs with semantic elements: header, nav, main, article, section, aside, footer. Add heading hierarchy (h1-h6) within sections. Use aria-labelledby on sections for screen reader context."
+    tags: [javascript, html, accessibility, semantics]
+
+  # === PITFALL (3) ===
+  - id: js-htmlcss-013
+    type: pitfall
+    trap: "Using a div with an onClick handler instead of a button element."
+    why: "Divs are not focusable or keyboard-accessible by default. Screen readers do not announce them as interactive. You lose native click, Enter, and Space key behavior."
+    prevention: "Use semantic HTML: <button> for actions, <a> for navigation. If you must use a div, add role='button', tabindex='0', and keyboard event handlers."
+    tags: [javascript, html, accessibility, pitfall]
+
+  - id: js-htmlcss-014
+    type: pitfall
+    trap: "Overusing !important to fix CSS specificity conflicts."
+    why: "!important breaks the natural cascade, makes styles nearly impossible to override, and leads to an escalating war of !important declarations."
+    prevention: "Use @layer for cascade control, reduce selector specificity, use BEM or CSS Modules for scoping. Reserve !important for utility classes only."
+    tags: [javascript, css, specificity, pitfall]
+
+  - id: js-htmlcss-015
+    type: pitfall
+    trap: "Using only color to convey meaning (e.g., red for errors, green for success)."
+    why: "Color-blind users (8% of men) cannot distinguish these colors. WCAG requires information not to rely solely on color."
+    prevention: "Combine color with icons, text labels, or patterns. Use sufficient contrast (4.5:1 AA). Test with color blindness simulators."
+    tags: [javascript, html, accessibility, pitfall]

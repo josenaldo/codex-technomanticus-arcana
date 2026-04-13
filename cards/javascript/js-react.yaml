@@ -1,0 +1,109 @@
+source: "JavaScript/Frontend/React.md"
+source_hash: "9c11a182957f"
+deck: "Codex::JavaScript"
+generated: "2026-04-13"
+tags:
+  - javascript
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+  - id: js-react-001
+    type: basic
+    front: "What does the React Compiler (React 19) do and what manual optimizations does it replace?"
+    back: "It automatically inserts memoization at compile time, largely replacing manual useMemo, useCallback, and React.memo. It assumes code follows Rules of React (no mutation in render)."
+    tags: [javascript, react, react19, compiler, performance]
+
+  - id: js-react-002
+    type: basic
+    front: "What is the difference between Server Components and Client Components in React 19?"
+    back: "Server Components run only on the server, send zero JS to the client, and can access DB/filesystem directly. Client Components use 'use client' directive and support interactivity (useState, event handlers)."
+    tags: [javascript, react, react19, rsc]
+
+  - id: js-react-003
+    type: basic
+    front: "How does React's reconciliation algorithm decide what to update in the DOM?"
+    back: "Virtual DOM diffing with two heuristics: (1) different element type = full replacement of subtree, (2) same type = update only changed props/attributes. Lists use keys to match elements across renders."
+    tags: [javascript, react, reconciliation, virtualdom]
+
+  - id: js-react-004
+    type: basic
+    front: "What are the three Rules of Hooks in React?"
+    back: "1) Only call hooks at the top level (never in conditions/loops). 2) Only call hooks from React components or custom hooks. 3) Custom hooks must start with 'use'. Enforced by eslint-plugin-react-hooks."
+    tags: [javascript, react, hooks]
+
+  - id: js-react-005
+    type: basic
+    front: "What is the state management progression in a React app as complexity grows?"
+    back: "useState (local) -> lift state up -> useContext (global simple) -> Zustand/Redux (complex client state) -> React Query/TanStack Query (server state with cache, stale-while-revalidate)."
+    tags: [javascript, react, statemanagement]
+
+  # === CLOZE (3) ===
+  - id: js-react-006
+    type: cloze
+    text: "In React, {{c1::useContext}} re-renders ALL consumers when its value changes, so avoid placing frequently-changing state in it."
+    tags: [javascript, react, hooks, context]
+
+  - id: js-react-007
+    type: cloze
+    text: "React 19 introduced {{c1::Server Actions}} marked with 'use server' that allow forms to call server-side mutations directly without a separate {{c2::API}} layer."
+    tags: [javascript, react, react19, serveractions]
+
+  - id: js-react-008
+    type: cloze
+    text: "The {{c1::useTransition}} hook marks state updates as non-urgent, letting React keep the UI responsive while computing expensive updates in the background."
+    tags: [javascript, react, hooks, performance]
+
+  # === VOCAB (2) ===
+  - id: js-react-009
+    type: vocab
+    term_pt: "reconciliacao"
+    term_en: "reconciliation"
+    definition: "React's algorithm that diffs the Virtual DOM tree before and after a state change, computing the minimal set of DOM mutations needed."
+    usage: "React's reconciliation uses element type and keys to efficiently determine which components to re-render or replace."
+    tags: [javascript, react, reconciliation, vocab]
+
+  - id: js-react-010
+    type: vocab
+    term_pt: "closure obsoleta"
+    term_en: "stale closure"
+    definition: "A bug where a callback captures an old value from a previous render because the dependency array of useEffect does not include it."
+    usage: "Using setCount(count + 1) inside setInterval with [] deps creates a stale closure. Fix with the updater: setCount(c => c + 1)."
+    tags: [javascript, react, hooks, closures, vocab]
+
+  # === SCENARIO (2) ===
+  - id: js-react-011
+    type: scenario
+    situation: "You have a search input that filters a list of 10,000 items. Typing feels sluggish because every keystroke triggers a full re-render of the list."
+    question: "How do you fix this with React 18+ APIs?"
+    answer: "Use useTransition or useDeferredValue to mark the list filtering as non-urgent. The input stays responsive while the list update is deferred until the browser is idle."
+    tags: [javascript, react, performance, useTransition]
+
+  - id: js-react-012
+    type: scenario
+    situation: "A list component uses array index as the key prop. Users report that after deleting an item from the middle, input fields show wrong values."
+    question: "Why does this happen and how do you fix it?"
+    answer: "Index keys cause React to reuse DOM nodes with mismatched state after deletions. Fix by using a stable, unique ID from the data (e.g., item.id) as the key."
+    tags: [javascript, react, reconciliation, keys]
+
+  # === PITFALL (3) ===
+  - id: js-react-013
+    type: pitfall
+    trap: "Placing useState or useEffect inside a conditional block."
+    why: "React tracks hooks by call order. Conditional hooks change the order between renders, causing hooks to return wrong state or crash."
+    prevention: "Always call hooks at the top level. Move the conditional logic inside the hook (e.g., early return in useEffect, or conditional setState)."
+    tags: [javascript, react, hooks, pitfall]
+
+  - id: js-react-014
+    type: pitfall
+    trap: "Using {count && <Badge />} when count can be 0."
+    why: "JavaScript short-circuit: 0 is falsy, so the expression evaluates to 0 (a number), and React renders the literal '0' on screen instead of nothing."
+    prevention: "Use an explicit boolean: {count > 0 && <Badge />} or a ternary: {count ? <Badge /> : null}."
+    tags: [javascript, react, jsx, pitfall]
+
+  - id: js-react-015
+    type: pitfall
+    trap: "Putting all app state into a single React Context."
+    why: "Any change to the context value re-renders every consumer component, even those that only use an unrelated slice of the state. This causes massive unnecessary re-renders."
+    prevention: "Split into multiple contexts by domain (theme, auth, settings). For complex global state, use Zustand or Redux which allow selective subscriptions."
+    tags: [javascript, react, context, performance, pitfall]
