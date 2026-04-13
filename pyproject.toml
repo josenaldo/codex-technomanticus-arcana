@@ -10,6 +10,15 @@ dependencies = [
     "markdown>=3.5",
 ]
 
+[tool.uv]
+package = true
+
+[tool.setuptools.packages.find]
+include = ["scripts*"]
+
+[project.scripts]
+cta = "scripts.cli:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
