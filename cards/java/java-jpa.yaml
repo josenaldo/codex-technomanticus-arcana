@@ -1,0 +1,114 @@
+source: "Java/Backend/Spring Data JPA.md"
+source_hash: "8b4deda3fcdc"
+deck: "Codex::Java"
+generated: "2026-04-13"
+tags:
+  - java
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+
+  - id: java-jpa-001
+    type: basic
+    front: "What is the recommended @GeneratedValue strategy for write-heavy workloads in JPA and why?"
+    back: "Use GenerationType.SEQUENCE with allocationSize (e.g. 50). Unlike IDENTITY, SEQUENCE lets Hibernate pre-allocate IDs in batches, enabling JDBC batch inserts without immediate INSERT per entity."
+    tags: [java, jpa, id-generation, performance]
+
+  - id: java-jpa-002
+    type: basic
+    front: "Why can't Java records be used as JPA @Entity classes?"
+    back: "Records are immutable (final fields) and lack a no-arg constructor. JPA requires mutability for proxy-based lazy loading and a no-arg constructor for instantiation. Use records for DTOs/projections instead."
+    tags: [java, jpa, entity, records]
+
+  - id: java-jpa-003
+    type: basic
+    front: "What is the N+1 problem in JPA/Hibernate?"
+    back: "1 query loads N parent entities, then N additional queries fire to load each parent's lazy association. Fix with JOIN FETCH, @EntityGraph, @BatchSize, or DTO projections."
+    tags: [java, jpa, n-plus-one, performance]
+
+  - id: java-jpa-004
+    type: basic
+    front: "What are the four JPA entity states in the persistence context lifecycle?"
+    back: "Transient (new, not managed), Managed (tracked, dirty-checked), Detached (was managed, session closed), Removed (scheduled for deletion). Only managed entities participate in dirty checking and flush."
+    tags: [java, jpa, persistence-context, entity-states]
+
+  - id: java-jpa-005
+    type: basic
+    front: "How does optimistic locking work in JPA?"
+    back: "@Version field (int/long/Timestamp) is checked at UPDATE time. If another transaction changed the row, the version mismatches and Hibernate throws OptimisticLockException. No database locks held."
+    tags: [java, jpa, locking, concurrency]
+
+  # === CLOZE (3) ===
+
+  - id: java-jpa-006
+    type: cloze
+    text: "The JPA persistence context acts as a {{c1::first-level cache}} and performs {{c2::dirty checking}} to automatically detect and flush entity changes."
+    tags: [java, jpa, persistence-context]
+
+  - id: java-jpa-007
+    type: cloze
+    text: "To fix LazyInitializationException in production, use {{c1::DTO projections}} or {{c2::@EntityGraph}} instead of enabling OSIV (Open Session In View)."
+    tags: [java, jpa, lazy-loading, best-practices]
+
+  - id: java-jpa-008
+    type: cloze
+    text: "Spring Data JPA supports derived queries from method names, {{c1::@Query}} for JPQL/native SQL, and {{c2::Specifications}} for dynamic criteria-based queries."
+    tags: [java, jpa, spring-data, repositories]
+
+  # === VOCAB (2) ===
+
+  - id: java-jpa-009
+    type: vocab
+    term_pt: "Busca preguicosa (Lazy Fetch)"
+    term_en: "Lazy Fetching"
+    definition: "Strategy where associated entities are loaded only when accessed, not at query time. Default for @OneToMany/@ManyToMany. Always preferred over EAGER to avoid unnecessary joins."
+    usage: "@ManyToOne(fetch = FetchType.LAZY) — override the default EAGER to prevent loading the full object graph on every query."
+    tags: [java, jpa, fetch-strategy, vocabulario]
+
+  - id: java-jpa-010
+    type: vocab
+    term_pt: "Projecao (Projection)"
+    term_en: "Projection"
+    definition: "Fetching only specific columns/fields instead of full entities. Can be interface-based, class-based (DTO), or dynamic. Reduces memory and avoids managed-state overhead."
+    usage: "Use interface projections for read-only views and class-based DTO projections for complex transformations or cross-entity data."
+    tags: [java, jpa, spring-data, projection, vocabulario]
+
+  # === SCENARIO (2) ===
+
+  - id: java-jpa-011
+    type: scenario
+    situation: "Your API endpoint returns a list of Orders, each with OrderItems. In production, response times spike to 5 seconds for 100 orders."
+    question: "What is the most likely cause and how do you fix it?"
+    answer: "N+1 problem: 1 query for orders + 100 queries for items. Fix with JOIN FETCH in JPQL, @EntityGraph on the repository method, or @BatchSize on the collection mapping."
+    tags: [java, jpa, n-plus-one, performance, scenario]
+
+  - id: java-jpa-012
+    type: scenario
+    situation: "Two users edit the same Patient entity simultaneously. User A saves first. User B saves second and overwrites User A's changes."
+    question: "How do you prevent this lost update?"
+    answer: "Add @Version field to Patient entity. Hibernate checks version on UPDATE; if it changed, throws OptimisticLockException. Catch it and prompt User B to reload and retry."
+    tags: [java, jpa, locking, concurrency, scenario]
+
+  # === PITFALL (3) ===
+
+  - id: java-jpa-013
+    type: pitfall
+    trap: "Using Lombok @Data on JPA entities."
+    why: "@Data generates equals/hashCode using all fields including lazy collections, causing LazyInitializationException. It also includes mutable fields, breaking Set/Map behavior across entity states."
+    prevention: "Never use @Data on entities. Implement equals/hashCode manually using a business key (email, UUID). Exclude relations from @ToString."
+    tags: [java, jpa, lombok, pitfall]
+
+  - id: java-jpa-014
+    type: pitfall
+    trap: "Using GenerationType.IDENTITY with batch inserts expecting good performance."
+    why: "IDENTITY forces Hibernate to execute INSERT immediately to get the generated ID, disabling JDBC batching entirely. Each save triggers a separate roundtrip."
+    prevention: "Use GenerationType.SEQUENCE with allocationSize (e.g. 50). Hibernate pre-fetches IDs in bulk, enabling batch inserts."
+    tags: [java, jpa, id-generation, batching, pitfall]
+
+  - id: java-jpa-015
+    type: pitfall
+    trap: "Leaving @ManyToOne with its default FetchType.EAGER in production."
+    why: "@ManyToOne defaults to EAGER, silently loading the parent entity on every query. With deep graphs, this cascades into loading dozens of unneeded tables."
+    prevention: "Always set @ManyToOne(fetch = FetchType.LAZY). Load associations explicitly via JOIN FETCH or @EntityGraph when needed."
+    tags: [java, jpa, fetch-strategy, eager, pitfall]

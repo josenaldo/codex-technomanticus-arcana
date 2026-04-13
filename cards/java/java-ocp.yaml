@@ -1,0 +1,121 @@
+source: "Java/Core/Certificação Java OCP.md"
+source_hash: "7896f3125eb2"
+deck: "Codex::Java"
+generated: "2026-04-13"
+tags:
+  - java
+  - entrevista
+
+cards:
+  - id: java-ocp-001
+    type: basic
+    front: "Qual o formato do exame OCP Java SE 21 (1Z0-830)?"
+    back: |
+      50 questões, 90 minutos, ~68% para aprovação. Cobre
+      módulos, records, sealed classes, pattern matching,
+      virtual threads e sequenced collections.
+    tags: [java, ocp, certificacao]
+
+  - id: java-ocp-002
+    type: basic
+    front: "Por que Integer a = 127; Integer b = 127; (a == b) é true, mas com 128 é false?"
+    back: |
+      Java cacheia Integer de -128 a 127 (IntegerCache). Dentro
+      desse range, autoboxing retorna a mesma referência. Fora
+      do range, cria objetos distintos, e == compara referências.
+    tags: [java, ocp, autoboxing]
+
+  - id: java-ocp-003
+    type: basic
+    front: "Quais são as limitações da keyword var em Java?"
+    back: |
+      Não pode ser usada com: null (tipo não inferível),
+      lambdas sem contexto, retorno de método, campos de classe,
+      parâmetros de método. Só funciona para variáveis locais
+      com inicialização imediata.
+    tags: [java, ocp, var]
+
+  - id: java-ocp-004
+    type: basic
+    front: "Em try-finally com return em ambos, qual return vence?"
+    back: |
+      O return do finally sempre vence. Se try retorna 1 e
+      finally retorna 2, o método retorna 2. O valor do try
+      é descartado. Isso também engole exceções do try.
+    tags: [java, ocp, excecoes]
+
+  - id: java-ocp-005
+    type: basic
+    front: "Qual a diferença entre method hiding e method overriding?"
+    back: |
+      Override (instância): resolvido em runtime via polimorfismo.
+      Hiding (static): resolvido em compile-time pelo tipo da
+      referência. Parent p = new Child(); p.staticMethod()
+      chama o do Parent, não do Child.
+    tags: [java, ocp, heranca]
+
+  - id: java-ocp-006
+    type: cloze
+    text: "Na resolução de overload, a JVM prioriza: {{c1::exact match → widening → autoboxing}} → varargs, nessa ordem."
+    tags: [java, ocp, overload]
+
+  - id: java-ocp-007
+    type: cloze
+    text: "Em JPMS, {{c1::requires}} declara dependência de módulo, {{c2::exports}} torna pacotes acessíveis a outros módulos."
+    tags: [java, ocp, modulos]
+
+  - id: java-ocp-008
+    type: cloze
+    text: "Switch expressions em Java usam {{c1::yield}} para retornar valor de um bloco, enquanto arrow labels ({{c2::->}}) retornam diretamente sem fall-through."
+    tags: [java, ocp, switch]
+
+  - id: java-ocp-009
+    type: vocab
+    term_pt: "Correspondência de padrões"
+    term_en: "Pattern matching"
+    definition: "Language feature that combines type testing and extraction in one step — instanceof (Java 16) and switch (Java 21) with record destructuring."
+    usage: "With pattern matching, I can destructure a record directly in the switch case."
+    tags: [java, ocp, vocabulario]
+
+  - id: java-ocp-010
+    type: vocab
+    term_pt: "Coleções sequenciadas"
+    term_en: "Sequenced collections"
+    definition: "Java 21 interfaces (SequencedCollection/Map) adding getFirst(), getLast(), reversed() to ordered collections like List and LinkedHashMap."
+    usage: "With sequenced collections, I can call getFirst() on any List instead of get(0)."
+    tags: [java, ocp, vocabulario, java21]
+
+  - id: java-ocp-011
+    type: scenario
+    situation: "Você autoboxa null de um Map.get() em um int primitivo."
+    question: "O que acontece?"
+    answer: "NullPointerException. Map.get() retorna Integer (null se ausente). Autoboxing chama intValue() no null. Use getOrDefault() ou verifique null antes de unboxar."
+    tags: [java, ocp, entrevista]
+
+  - id: java-ocp-012
+    type: scenario
+    situation: "Você quer usar ServiceLoader para carregar implementações de uma interface em JPMS."
+    question: "O que precisa declarar no module-info.java?"
+    answer: "O módulo provider declara 'provides Interface with Impl'. O módulo consumer declara 'uses Interface'. O pacote da impl não precisa ser exported — ServiceLoader acessa via reflexão controlada."
+    tags: [java, ocp, modulos, entrevista]
+
+  - id: java-ocp-013
+    type: pitfall
+    trap: "Usar == para comparar strings vindas de new String()"
+    why: "new String(\"abc\") cria objeto fora do pool. \"abc\" == new String(\"abc\") é false mesmo com conteúdo igual."
+    prevention: "Sempre use .equals() para strings. String pool só funciona para literals e .intern()."
+    tags: [java, ocp, armadilhas]
+
+  - id: java-ocp-014
+    type: pitfall
+    trap: "Esperar que sealed class switch sem default dê erro de compilação ao adicionar subclasse"
+    why: "Funciona com switch expressions (que exigem exhaustiveness). Switch statements tradicionais não exigem, e silenciosamente ignoram o novo caso."
+    prevention: "Use switch expressions (com retorno) para garantir exhaustive matching com sealed classes."
+    tags: [java, ocp, armadilhas, sealed]
+
+  - id: java-ocp-015
+    type: pitfall
+    trap: "Colocar return dentro de finally para tratar erro"
+    why: "finally com return mascara qualquer exceção lançada no try ou catch — a exceção desaparece silenciosamente."
+    prevention: "Nunca use return em finally. Use catch para tratar exceções e finally apenas para cleanup."
+    tags: [java, ocp, armadilhas, excecoes]

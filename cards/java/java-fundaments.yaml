@@ -1,0 +1,122 @@
+source: "Java/Core/Java Fundamentals.md"
+source_hash: "042948ee158d"
+deck: "Codex::Java"
+generated: "2026-04-13"
+tags:
+  - java
+  - entrevista
+
+cards:
+  - id: java-fundaments-001
+    type: basic
+    front: "Quais são as principais áreas de memória da JVM?"
+    back: |
+      Heap (Young Gen + Old Gen), Metaspace (metadados de classes,
+      substituiu PermGen), Stack (uma por thread, frames de métodos),
+      e Program Counter Register (instrução atual por thread).
+    tags: [java, jvm, memoria]
+
+  - id: java-fundaments-002
+    type: basic
+    front: "Qual a diferença entre G1 e ZGC como garbage collectors?"
+    back: |
+      G1 é o default desde Java 9 — divide heap em regiões, pausas
+      ~200ms. ZGC garante pausas <1ms independente do heap size,
+      ideal para aplicações de baixa latência com heaps grandes.
+    tags: [java, jvm, gc]
+
+  - id: java-fundaments-003
+    type: basic
+    front: "O que é JIT compilation e quais os compiladores C1 e C2?"
+    back: |
+      JIT compila bytecode para código nativo em runtime. C1
+      compila rápido com otimizações leves (client). C2 faz
+      otimizações agressivas (inlining, escape analysis).
+      Tiered compilation usa ambos progressivamente.
+    tags: [java, jvm, jit]
+
+  - id: java-fundaments-004
+    type: basic
+    front: "Como funciona o classloader hierarchy em Java?"
+    back: |
+      Usa parent delegation: Bootstrap → Platform → Application.
+      Cada classloader delega ao pai antes de tentar carregar.
+      Isso garante que classes core (java.lang) não sejam
+      sobrescritas por classes do usuário.
+    tags: [java, jvm, classloader]
+
+  - id: java-fundaments-005
+    type: basic
+    front: "Qual a diferença entre ArrayList e LinkedList em termos de performance?"
+    back: |
+      ArrayList: O(1) acesso por índice, O(n) inserção no meio,
+      cache-friendly. LinkedList: O(n) acesso, O(1) inserção/remoção
+      se já tem o nó. Na prática, ArrayList vence quase sempre
+      pela localidade de cache.
+    tags: [java, collections]
+
+  - id: java-fundaments-006
+    type: cloze
+    text: "String em Java é {{c1::imutável}} — concatenação em loop cria múltiplos objetos; use {{c2::StringBuilder}} para performance."
+    tags: [java, string]
+
+  - id: java-fundaments-007
+    type: cloze
+    text: "HashMap usa {{c1::array de buckets}} com hash do key. A partir do Java 8, buckets com muitas colisões viram {{c2::árvores red-black}} em vez de linked lists."
+    tags: [java, collections, hashmap]
+
+  - id: java-fundaments-008
+    type: cloze
+    text: "Streams são {{c1::lazy}} — operações intermediárias só executam quando um {{c2::terminal operator}} (collect, forEach, reduce) é chamado."
+    tags: [java, streams]
+
+  - id: java-fundaments-009
+    type: vocab
+    term_pt: "Autoboxing"
+    term_en: "Autoboxing"
+    definition: "Automatic conversion between primitive types (int) and their wrapper classes (Integer) done by the compiler."
+    usage: "Be careful with autoboxing in tight loops — it creates unnecessary Integer objects and kills performance."
+    tags: [java, vocabulario, primitivos]
+
+  - id: java-fundaments-010
+    type: vocab
+    term_pt: "Classes seladas"
+    term_en: "Sealed classes"
+    definition: "Java 17+ feature that restricts which classes can extend a class/interface, enabling exhaustive pattern matching in switch."
+    usage: "I used sealed classes so the compiler enforces exhaustive switch coverage."
+    tags: [java, vocabulario, java17]
+
+  - id: java-fundaments-011
+    type: scenario
+    situation: "Você precisa criar DTOs imutáveis com equals/hashCode/toString em Java 16+."
+    question: "Qual feature usar?"
+    answer: "Records — declaram campos no header, geram automaticamente construtor canônico, accessors, equals, hashCode e toString. Compact constructor permite validação sem repetir parâmetros."
+    tags: [java, records, entrevista]
+
+  - id: java-fundaments-012
+    type: scenario
+    situation: "Você está usando parallelStream() para processar I/O em uma aplicação web."
+    question: "Qual o problema?"
+    answer: "parallelStream usa o ForkJoinPool.commonPool() compartilhado pela JVM inteira. I/O bloqueante esgota as threads e trava outras operações paralelas. Use ExecutorService dedicado ou virtual threads."
+    tags: [java, streams, entrevista]
+
+  - id: java-fundaments-013
+    type: pitfall
+    trap: "Comparar wrappers com == em vez de .equals()"
+    why: "Integer cache cobre apenas -128 a 127. Fora disso, == compara referências: new Integer(200) == new Integer(200) é false."
+    prevention: "Sempre use .equals() para comparar wrappers, ou faça unboxing explícito."
+    tags: [java, armadilhas, autoboxing]
+
+  - id: java-fundaments-014
+    type: pitfall
+    trap: "Autoboxing null em primitivo dentro de loop"
+    why: "Integer x = null; int y = x; lança NullPointerException. Autoboxing chama .intValue() no null."
+    prevention: "Verifique null antes de unboxing ou use OptionalInt para valores opcionais."
+    tags: [java, armadilhas, autoboxing]
+
+  - id: java-fundaments-015
+    type: pitfall
+    trap: "Usar Comparable genérico sem tipar (raw type)"
+    why: "class Foo implements Comparable (sem <Foo>) compila mas compareTo recebe Object, exigindo cast e perdendo type safety."
+    prevention: "Sempre tipar: implements Comparable<Foo> para compareTo(Foo other) tipado."
+    tags: [java, armadilhas, comparable]

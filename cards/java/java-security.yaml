@@ -1,0 +1,114 @@
+source: "Java/Backend/Spring Security.md"
+source_hash: "a80e522be3f7"
+deck: "Codex::Java"
+generated: "2026-04-13"
+tags:
+  - java
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+
+  - id: java-security-001
+    type: basic
+    front: "How is Spring Security 6+ configured differently from Spring Security 5.x?"
+    back: "Spring Security 6+ uses a SecurityFilterChain @Bean with lambda DSL. WebSecurityConfigurerAdapter was removed. antMatchers became requestMatchers. Configuration is component-based, not inheritance-based."
+    tags: [java, spring-security, configuration]
+
+  - id: java-security-002
+    type: basic
+    front: "What is the role of SecurityContextHolder in Spring Security?"
+    back: "SecurityContextHolder stores the current authenticated user (Authentication object) in a ThreadLocal for the duration of the request. It provides access to the principal, credentials, and granted authorities."
+    tags: [java, spring-security, authentication]
+
+  - id: java-security-003
+    type: basic
+    front: "When should you disable CSRF protection in Spring Security?"
+    back: "Disable CSRF for stateless APIs using JWT/token auth (no cookies/sessions). Keep CSRF enabled for traditional web apps using cookie-based sessions, as browsers automatically attach cookies to cross-origin requests."
+    tags: [java, spring-security, csrf]
+
+  - id: java-security-004
+    type: basic
+    front: "What OAuth2 flow should you use for web/mobile apps and why?"
+    back: "Authorization Code with PKCE. It keeps tokens off the URL (unlike Implicit, now deprecated) and works for public clients that can't store secrets. Password grant is also deprecated."
+    tags: [java, spring-security, oauth2]
+
+  - id: java-security-005
+    type: basic
+    front: "What is the Spring Security Filter Chain and how does it work?"
+    back: "A pipeline of 20+ ordered servlet filters intercepting every HTTP request. Each filter handles one concern (CORS, CSRF, auth, authorization). Failures are caught by ExceptionTranslationFilter and converted to 401/403."
+    tags: [java, spring-security, filter-chain, architecture]
+
+  # === CLOZE (3) ===
+
+  - id: java-security-006
+    type: cloze
+    text: "In Spring Security, {{c1::authentication}} determines who the user is, while {{c2::authorization}} determines what they can do."
+    tags: [java, spring-security, fundamentals]
+
+  - id: java-security-007
+    type: cloze
+    text: "For method-level security, Spring provides {{c1::@PreAuthorize}} to check permissions before execution and {{c2::@PostAuthorize}} to check after, both using SpEL expressions."
+    tags: [java, spring-security, method-security]
+
+  - id: java-security-008
+    type: cloze
+    text: "JWT tokens are {{c1::stateless}} which makes horizontal scaling easy, but {{c2::revocation}} is difficult because the server doesn't track issued tokens."
+    tags: [java, spring-security, jwt]
+
+  # === VOCAB (2) ===
+
+  - id: java-security-009
+    type: vocab
+    term_pt: "Cadeia de Filtros (Filter Chain)"
+    term_en: "Security Filter Chain"
+    definition: "Ordered pipeline of servlet filters in Spring Security that processes every request. Includes CorsFilter, CsrfFilter, authentication filters, and AuthorizationFilter in a fixed sequence."
+    usage: "Configure via SecurityFilterChain bean to define which filters apply, what URLs require auth, and how authentication works."
+    tags: [java, spring-security, filter-chain, vocabulario]
+
+  - id: java-security-010
+    type: vocab
+    term_pt: "Servidor de Recursos (Resource Server)"
+    term_en: "Resource Server"
+    definition: "An API that validates access tokens (typically JWT) to authorize requests. It does not issue tokens itself; it trusts an Authorization Server via issuer-uri configuration."
+    usage: "Configure with oauth2ResourceServer(jwt -> jwt.jwkSetUri(...)) to validate incoming Bearer tokens on each request."
+    tags: [java, spring-security, oauth2, resource-server, vocabulario]
+
+  # === SCENARIO (2) ===
+
+  - id: java-security-011
+    type: scenario
+    situation: "Your SPA frontend at https://app.example.com calls your API at https://api.example.com. Requests fail with CORS errors, but only when sending the Authorization header."
+    question: "What is wrong and how do you fix it?"
+    answer: "Preflight OPTIONS request is blocked. Configure CORS with explicit allowedOrigins (not *), allowedHeaders including Authorization, and allowCredentials(true). Wildcard * with credentials is rejected by browsers."
+    tags: [java, spring-security, cors, scenario]
+
+  - id: java-security-012
+    type: scenario
+    situation: "You need server-to-server communication between two internal microservices with no user context involved."
+    question: "Which OAuth2 flow should you use?"
+    answer: "Client Credentials flow. The calling service authenticates directly with client_id and client_secret to obtain an access token. No user interaction or browser redirect is needed."
+    tags: [java, spring-security, oauth2, microservices, scenario]
+
+  # === PITFALL (3) ===
+
+  - id: java-security-013
+    type: pitfall
+    trap: "Disabling CSRF on a traditional web app that uses cookie-based sessions."
+    why: "Cookies are sent automatically by browsers on cross-origin requests. Without CSRF tokens, an attacker's page can submit forms to your app and the browser attaches the session cookie, executing actions as the logged-in user."
+    prevention: "Only disable CSRF for stateless APIs using Bearer tokens. Keep it enabled for any app using cookies/sessions for auth."
+    tags: [java, spring-security, csrf, pitfall]
+
+  - id: java-security-014
+    type: pitfall
+    trap: "Storing JWT refresh tokens in browser localStorage."
+    why: "localStorage is accessible to any JavaScript on the page. An XSS vulnerability exposes refresh tokens, giving attackers long-lived access. Refresh tokens are high-value targets."
+    prevention: "Store refresh tokens server-side or in httpOnly secure cookies. Use short-lived access tokens (5-15 min). Rotate refresh tokens on each use."
+    tags: [java, spring-security, jwt, xss, pitfall]
+
+  - id: java-security-015
+    type: pitfall
+    trap: "Using CORS allowedOrigins('*') with allowCredentials(true)."
+    why: "Browsers explicitly reject this combination per the CORS spec. The request fails silently in production. Wildcard origins with credentials is a security risk the browser refuses to allow."
+    prevention: "List explicit allowed origins. Never use * with credentials. In dev, use a specific localhost origin."
+    tags: [java, spring-security, cors, pitfall]

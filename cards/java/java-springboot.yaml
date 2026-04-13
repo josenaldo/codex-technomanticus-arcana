@@ -1,0 +1,124 @@
+source: "Java/Backend/Spring Boot.md"
+source_hash: "4017636d8968"
+deck: "Codex::Java"
+generated: "2026-04-13"
+tags:
+  - java
+  - entrevista
+
+cards:
+  - id: java-springboot-001
+    type: basic
+    front: "Qual a diferença entre BeanFactory e ApplicationContext?"
+    back: |
+      BeanFactory é o container básico (lazy loading). ApplicationContext
+      estende com: eager loading, eventos, i18n, AOP automático,
+      e integração com Spring MVC. Na prática, sempre use
+      ApplicationContext.
+    tags: [java, spring, ioc]
+
+  - id: java-springboot-002
+    type: basic
+    front: "Por que constructor injection é preferível a field @Autowired?"
+    back: |
+      Constructor injection: dependências explícitas, imutáveis (final),
+      fácil de testar (sem reflexão), falha rápido se falta bean.
+      Field injection esconde dependências, dificulta testes e
+      permite estado parcialmente inicializado.
+    tags: [java, spring, di]
+
+  - id: java-springboot-003
+    type: basic
+    front: "Quais os bean scopes em Spring e o principal pitfall de prototype?"
+    back: |
+      Scopes: singleton (default), prototype, request, session,
+      application. Pitfall: prototype injetado em singleton é
+      criado UMA vez. Use ObjectProvider<T> ou @Lookup para
+      obter nova instância a cada uso.
+    tags: [java, spring, beans]
+
+  - id: java-springboot-004
+    type: basic
+    front: "Qual a diferença entre @Component, @Service, @Repository e @Controller?"
+    back: |
+      Todos são @Component (escaneados). Diferença semântica:
+      @Service = lógica de negócio, @Repository = acesso a dados
+      (adiciona tradução de exceções SQL→DataAccessException),
+      @Controller = endpoint web (habilita @RequestMapping).
+    tags: [java, spring, estereotipos]
+
+  - id: java-springboot-005
+    type: basic
+    front: "Quais os tipos de proxy AOP no Spring e quando cada é usado?"
+    back: |
+      JDK Dynamic Proxy: classe implementa interface (proxy
+      implementa mesma interface). CGLIB: classe sem interface
+      (gera subclasse via bytecode). Spring Boot usa CGLIB por
+      default desde 2.0 (proxyTargetClass=true).
+    tags: [java, spring, aop]
+
+  - id: java-springboot-006
+    type: cloze
+    text: "@Transactional por padrão faz rollback apenas em {{c1::RuntimeException (unchecked)}}. Para checked exceptions, declare {{c2::rollbackFor = Exception.class}} explicitamente."
+    tags: [java, spring, transactional]
+
+  - id: java-springboot-007
+    type: cloze
+    text: "O pipeline Spring MVC é: DispatcherServlet → {{c1::HandlerMapping}} → HandlerAdapter → Controller → {{c2::HttpMessageConverter}} → Response."
+    tags: [java, spring, mvc]
+
+  - id: java-springboot-008
+    type: cloze
+    text: "Auto-configuration no Spring Boot usa {{c1::@ConditionalOnClass}} para ativar configuração somente quando a dependência está no {{c2::classpath}}."
+    tags: [java, spring, autoconfig]
+
+  - id: java-springboot-009
+    type: vocab
+    term_pt: "Inversão de controle"
+    term_en: "Inversion of Control (IoC)"
+    definition: "Design principle where the framework controls object creation and lifecycle instead of the application code, enabling loose coupling via dependency injection."
+    usage: "Spring's IoC container manages bean creation, so we just declare dependencies."
+    tags: [java, spring, vocabulario]
+
+  - id: java-springboot-010
+    type: vocab
+    term_pt: "Propagação transacional"
+    term_en: "Transaction propagation"
+    definition: "Policy defining how a transactional method behaves when called within an existing transaction — REQUIRED joins it, REQUIRES_NEW suspends it and creates a new one."
+    usage: "I set propagation to REQUIRES_NEW so the audit log commits even if the outer transaction rolls back."
+    tags: [java, spring, vocabulario, transactional]
+
+  - id: java-springboot-011
+    type: scenario
+    situation: "Um método @Transactional chama outro método @Transactional da mesma classe."
+    question: "A segunda transação é aplicada?"
+    answer: "Não. Spring AOP usa proxies — chamadas internas (this.method()) bypassa o proxy. A anotação é ignorada. Solução: injetar o próprio bean ou extrair para outra classe."
+    tags: [java, spring, entrevista]
+
+  - id: java-springboot-012
+    type: scenario
+    situation: "Você precisa expor configurações tipadas com validação no Spring Boot."
+    question: "Qual abordagem usar?"
+    answer: "Use @ConfigurationProperties(prefix) com um record ou classe com @Validated e anotações Bean Validation (@NotBlank, @Min). Habilite com @EnableConfigurationProperties. Mais seguro que @Value."
+    tags: [java, spring, entrevista]
+
+  - id: java-springboot-013
+    type: pitfall
+    trap: "Bean prototype injetado em singleton mantém sempre a mesma instância"
+    why: "O singleton é criado uma vez, e o prototype é injetado nesse momento. Não há re-injeção automática em cada uso."
+    prevention: "Use ObjectProvider<T>, Provider<T> (JSR-330) ou @Lookup para obter instância nova a cada chamada."
+    tags: [java, spring, armadilhas]
+
+  - id: java-springboot-014
+    type: pitfall
+    trap: "Esperar que @Transactional funcione em métodos private"
+    why: "Proxies AOP (JDK e CGLIB) não interceptam métodos private. A anotação é silenciosamente ignorada."
+    prevention: "Marque apenas métodos public (ou protected para CGLIB). Valide com logs de transação em dev."
+    tags: [java, spring, armadilhas, transactional]
+
+  - id: java-springboot-015
+    type: pitfall
+    trap: "Usar @Transactional(readOnly=true) achando que impede escritas"
+    why: "readOnly é uma dica para o provider. Hibernate otimiza (sem dirty checking), mas NÃO impede INSERT/UPDATE — o banco aceita normalmente."
+    prevention: "Use readOnly para otimização de leitura, não como controle de segurança. Controle escrita via roles/permissões."
+    tags: [java, spring, armadilhas, transactional]

@@ -1,0 +1,114 @@
+source: "Java/Backend/Testes em Java.md"
+source_hash: "311dda0fef10"
+deck: "Codex::Java"
+generated: "2026-04-13"
+tags:
+  - java
+  - entrevista
+
+cards:
+  # === BASIC (5) ===
+
+  - id: java-testing-001
+    type: basic
+    front: "What is the modern Java testing stack for Spring Boot 3+ projects?"
+    back: "JUnit 5 (Jupiter) for test framework, AssertJ for fluent assertions, Mockito for mocks/spies, Testcontainers for real database/infra in Docker, and Spring Boot Test for context slices."
+    tags: [java, testing, stack]
+
+  - id: java-testing-002
+    type: basic
+    front: "What is the difference between @WebMvcTest, @DataJpaTest, and @SpringBootTest?"
+    back: "@WebMvcTest loads only web layer (controllers, filters) with MockMvc. @DataJpaTest loads only JPA layer (repos, EntityManager). @SpringBootTest loads the full application context for integration tests."
+    tags: [java, testing, spring-boot, test-slices]
+
+  - id: java-testing-003
+    type: basic
+    front: "How does Testcontainers with @ServiceConnection work in Spring Boot 3.1+?"
+    back: "@Container creates a Docker container (e.g. PostgreSQLContainer). @ServiceConnection auto-configures the datasource URL, username, and password from the running container. No manual property override needed."
+    tags: [java, testing, testcontainers]
+
+  - id: java-testing-004
+    type: basic
+    front: "What is the AAA pattern in unit testing?"
+    back: "Arrange (set up test data and dependencies), Act (call the method under test), Assert (verify the result). Also known as Given-When-Then. Makes tests readable and consistently structured."
+    tags: [java, testing, patterns, best-practices]
+
+  - id: java-testing-005
+    type: basic
+    front: "What are the three sources for JUnit 5 @ParameterizedTest?"
+    back: "@ValueSource for simple single values, @CsvSource for inline comma-separated rows, and @MethodSource for complex objects via a static method returning a Stream. Also @EnumSource for all enum values."
+    tags: [java, testing, junit5, parameterized]
+
+  # === CLOZE (3) ===
+
+  - id: java-testing-006
+    type: cloze
+    text: "In Mockito, {{c1::when(...).thenReturn(...)}} stubs a method return value, while {{c2::verify(mock).method()}} asserts that the method was actually called."
+    tags: [java, testing, mockito]
+
+  - id: java-testing-007
+    type: cloze
+    text: "JUnit 5 is composed of three modules: {{c1::JUnit Platform}} as the execution foundation, and {{c2::JUnit Jupiter}} providing the modern test API."
+    tags: [java, testing, junit5, architecture]
+
+  - id: java-testing-008
+    type: cloze
+    text: "AssertJ's {{c1::assertThatThrownBy(() -> ...)}} replaces JUnit's assertThrows for exception testing, providing {{c2::fluent}} chaining for message and cause verification."
+    tags: [java, testing, assertj]
+
+  # === VOCAB (2) ===
+
+  - id: java-testing-009
+    type: vocab
+    term_pt: "Fatia de Teste (Test Slice)"
+    term_en: "Test Slice"
+    definition: "Spring Boot annotation that loads only a specific layer of the application context for testing. Faster than full context and isolates the layer under test."
+    usage: "@WebMvcTest(UserController.class) loads only the web layer, auto-configuring MockMvc and requiring @MockitoBean for service dependencies."
+    tags: [java, testing, spring-boot, test-slices, vocabulario]
+
+  - id: java-testing-010
+    type: vocab
+    term_pt: "Teste de Aptidao Arquitetural"
+    term_en: "Architecture Fitness Function"
+    definition: "Automated test that enforces architectural rules in code. ArchUnit checks package dependencies, naming conventions, and layer access rules at build time."
+    usage: "ArchUnit rule: classes in 'service' package must not depend on 'controller' package, enforced as a JUnit test that fails the build on violation."
+    tags: [java, testing, archunit, architecture, vocabulario]
+
+  # === SCENARIO (2) ===
+
+  - id: java-testing-011
+    type: scenario
+    situation: "Your service calls an external payment API. You need to test error handling when the API returns 500, times out, or returns malformed JSON."
+    question: "What tool do you use and why?"
+    answer: "WireMock. It creates a local HTTP server that simulates the external API. You configure stubs for each error scenario (status 500, delay, bad body) without hitting the real service."
+    tags: [java, testing, wiremock, integration, scenario]
+
+  - id: java-testing-012
+    type: scenario
+    situation: "A colleague writes tests that mock the repository, service, and even value objects. Every test has 10+ verify() calls. Tests pass but bugs still reach production."
+    question: "What is wrong with this testing approach?"
+    answer: "Over-mocking tests implementation details, not behavior. Tests break on refactoring but miss real bugs. Use real objects for value types, mock only external boundaries, and assert outcomes not interactions."
+    tags: [java, testing, mockito, anti-patterns, scenario]
+
+  # === PITFALL (3) ===
+
+  - id: java-testing-013
+    type: pitfall
+    trap: "Using H2 in-memory database for integration tests instead of Testcontainers."
+    why: "H2 has different SQL dialect, missing features (e.g. PostgreSQL-specific types, window functions), and lax constraints. Tests pass on H2 but fail in production on Postgres."
+    prevention: "Use Testcontainers with the same database engine as production. @ServiceConnection makes setup trivial in Spring Boot 3.1+."
+    tags: [java, testing, testcontainers, h2, pitfall]
+
+  - id: java-testing-014
+    type: pitfall
+    trap: "Using @SpringBootTest for every test class in a large project."
+    why: "Full context startup is slow (seconds to minutes). Running 500 tests with full context destroys developer feedback loop and CI speed. Most tests don't need the full context."
+    prevention: "Use test slices: @WebMvcTest for controllers, @DataJpaTest for repos. Reserve @SpringBootTest for true end-to-end integration tests only."
+    tags: [java, testing, spring-boot, performance, pitfall]
+
+  - id: java-testing-015
+    type: pitfall
+    trap: "Using @MockBean (now @MockitoBean) in @SpringBootTest to mock half the application."
+    why: "Each unique @MockBean combination creates a new Spring context (cache miss), multiplying startup time. It also hides integration issues between the mocked layers."
+    prevention: "If you need many mocks, use plain unit tests with @Mock/@InjectMocks. Use @SpringBootTest with real beans for true integration scenarios."
+    tags: [java, testing, spring-boot, mockbean, pitfall]

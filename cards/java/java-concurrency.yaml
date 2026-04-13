@@ -1,0 +1,122 @@
+source: "Java/Core/Java Concurrency.md"
+source_hash: "934af85b5443"
+deck: "Codex::Java"
+generated: "2026-04-13"
+tags:
+  - java
+  - entrevista
+
+cards:
+  - id: java-concurrency-001
+    type: basic
+    front: "O que é a relação happens-before no Java Memory Model?"
+    back: |
+      Garante que escritas feitas antes de uma ação são visíveis
+      após outra ação relacionada. Exemplos: unlock → lock no
+      mesmo monitor, escrita volatile → leitura volatile,
+      Thread.start() → primeira ação da thread.
+    tags: [java, concorrencia, jmm]
+
+  - id: java-concurrency-002
+    type: basic
+    front: "Qual a diferença entre volatile e synchronized?"
+    back: |
+      volatile garante visibilidade e ordering, mas NÃO atomicidade
+      (i++ não é atômico). synchronized garante visibilidade,
+      ordering E atomicidade do bloco inteiro via monitor lock.
+    tags: [java, concorrencia, volatile]
+
+  - id: java-concurrency-003
+    type: basic
+    front: "Quais as vantagens de ReentrantLock sobre synchronized?"
+    back: |
+      tryLock() com timeout (evita deadlock), fairness policy
+      (FIFO opcional), múltiplas Conditions (vs um único wait/notify),
+      lock interruptível. Mas exige try-finally para unlock manual.
+    tags: [java, concorrencia, locks]
+
+  - id: java-concurrency-004
+    type: basic
+    front: "O que é StampedLock e qual seu diferencial?"
+    back: |
+      Lock com três modos: write, read e optimistic read.
+      Optimistic read não bloqueia writers — valida o stamp
+      depois. Muito mais rápido para leituras frequentes.
+      Cuidado: NÃO é reentrante.
+    tags: [java, concorrencia, locks]
+
+  - id: java-concurrency-005
+    type: basic
+    front: "Quando usar LongAdder em vez de AtomicLong?"
+    back: |
+      LongAdder distribui o valor em cells internas, reduzindo
+      contention CAS em cenários de alta concorrência (contadores,
+      métricas). AtomicLong basta para baixa contention. LongAdder
+      é mais rápido para write-heavy, mas sum() não é atômico.
+    tags: [java, concorrencia, atomic]
+
+  - id: java-concurrency-006
+    type: cloze
+    text: "Virtual Threads (Java 21) são ideais para cargas {{c1::I/O-bound}} — criar milhões é viável. Para CPU-bound, use {{c2::platform threads}} pois virtual threads não ganham paralelismo extra."
+    tags: [java, concorrencia, virtualthreads]
+
+  - id: java-concurrency-007
+    type: cloze
+    text: "CompletableFuture.thenApply transforma o resultado {{c1::sincronamente}}, enquanto thenCompose aceita um retorno {{c2::CompletableFuture}} — equivalente a flatMap."
+    tags: [java, concorrencia, completablefuture]
+
+  - id: java-concurrency-008
+    type: cloze
+    text: "Double-checked locking exige que o campo seja {{c1::volatile}}, senão a JVM pode reordenar a escrita e outra thread vê o objeto {{c2::parcialmente construído}}."
+    tags: [java, concorrencia, singleton]
+
+  - id: java-concurrency-009
+    type: vocab
+    term_pt: "Roubo de trabalho"
+    term_en: "Work stealing"
+    definition: "Strategy where idle threads steal tasks from busy threads' deques, used by ForkJoinPool to balance load dynamically."
+    usage: "ForkJoinPool uses work stealing so idle threads grab tasks from other threads' queues."
+    tags: [java, concorrencia, vocabulario]
+
+  - id: java-concurrency-010
+    type: vocab
+    term_pt: "Barreira cíclica"
+    term_en: "CyclicBarrier"
+    definition: "Synchronization barrier where a fixed number of threads wait for each other at a common point, then proceed together. Reusable unlike CountDownLatch."
+    usage: "We used a CyclicBarrier to synchronize phases in our parallel simulation."
+    tags: [java, concorrencia, vocabulario]
+
+  - id: java-concurrency-011
+    type: scenario
+    situation: "Você tem um sistema produtor-consumidor com múltiplos producers e consumers."
+    question: "Qual estrutura de dados usar?"
+    answer: "BlockingQueue — ArrayBlockingQueue (bounded, backpressure) ou LinkedBlockingQueue. Producers chamam put() (bloqueia se cheio) e consumers chamam take() (bloqueia se vazio), sem sincronização manual."
+    tags: [java, concorrencia, entrevista]
+
+  - id: java-concurrency-012
+    type: scenario
+    situation: "Sua aplicação precisa executar tarefas assíncronas com timeout e fallback."
+    question: "Como implementar com CompletableFuture?"
+    answer: "Use supplyAsync() com executor, encadeie thenApply/thenCompose, adicione orTimeout()/completeOnTimeout() (Java 9+) e exceptionally() para fallback. Compose com allOf() para múltiplas tarefas."
+    tags: [java, concorrencia, entrevista]
+
+  - id: java-concurrency-013
+    type: pitfall
+    trap: "Sincronizar em String literal ou Integer cacheado"
+    why: "String literals e Integer -128..127 são compartilhados (pool/cache). Sincronizar neles causa lock contention inesperado entre código não-relacionado."
+    prevention: "Sincronize em objetos privados dedicados: private final Object lock = new Object()."
+    tags: [java, concorrencia, armadilhas]
+
+  - id: java-concurrency-014
+    type: pitfall
+    trap: "Usar Executors.newCachedThreadPool() sem limites"
+    why: "Cria threads ilimitadamente sob carga. Pode exaurir memória com milhares de threads OS em picos de requisições."
+    prevention: "Use newFixedThreadPool() com tamanho controlado ou ThreadPoolExecutor com bounded queue e rejection policy."
+    tags: [java, concorrencia, armadilhas]
+
+  - id: java-concurrency-015
+    type: pitfall
+    trap: "Não chamar shutdown() no ExecutorService"
+    why: "Threads do pool são non-daemon por padrão — a JVM nunca termina. O pool fica vazando threads e memória."
+    prevention: "Use try-with-resources (Java 19+) ou shutdown() + awaitTermination() em bloco finally."
+    tags: [java, concorrencia, armadilhas]
