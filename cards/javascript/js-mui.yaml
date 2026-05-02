@@ -1,0 +1,40 @@
+source: "JavaScript/Frontend/Material UI.md"
+source_hash: "46fa258fc3d9"
+deck: "Codex::JavaScript"
+generated: "2026-04-30"
+tags:
+  - javascript
+  - frontend
+  - ui-library
+  - mui
+
+cards:
+  - id: js-mui-001
+    type: basic
+    front: "O que é Material UI (MUI)?"
+    back: "É a biblioteca de componentes React mais popular que implementa o Material Design do Google, oferecendo componentes prontos, sistema de temas customizável e estilização via CSS-in-JS (Emotion)."
+    tags: [javascript, mui, conceitos]
+
+  - id: js-mui-002
+    type: basic
+    front: "Como funciona a customização global de estilo no MUI?"
+    back: "Utiliza-se a função `createTheme` para definir a paleta de cores, tipografia e formato, envolvendo a aplicação com o `<ThemeProvider theme={theme}>`."
+    tags: [javascript, mui, temas]
+
+  - id: js-mui-003
+    type: cloze
+    text: "No layout do MUI, o componente {{c1::Box}} atua como uma div genérica com props de sistema (sx, m, p), enquanto o {{c2::Stack}} é usado para organizar elementos em linha ou coluna com espaçamento (flexbox)."
+    tags: [javascript, mui, layout]
+
+  - id: js-mui-004
+    type: basic
+    front: "Quando devemos usar a prop `sx` vs a função `styled()` no MUI?"
+    back: "Use a prop `sx` para estilizações rápidas (one-off) diretamente no JSX, e `styled()` para criar componentes reutilizáveis e abstrair a complexidade de estilos do render."
+    tags: [javascript, mui, estilizacao]
+
+  - id: js-mui-005
+    type: pitfall
+    trap: "Lutar contra o Material Design (Over-customization)."
+    why: "Tentar mudar fundamentalmente o comportamento e as animações intrínsecas dos componentes (como o ripple effect) exige muito esforço para pouco retorno e pode quebrar a acessibilidade."
+    prevention: "Mantenha-se dentro das restrições do Material Design, customizando apenas tokens do tema (cores, fontes, bordas). Se o design for muito diferente, considere outra biblioteca ou headless UI."
+    tags: [javascript, mui, armadilhas]

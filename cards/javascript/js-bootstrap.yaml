@@ -1,0 +1,36 @@
+source: "JavaScript/Frontend/Bootstrap.md"
+source_hash: "6438cf39c6b5"
+deck: "Codex::JavaScript"
+generated: "2026-04-30"
+tags:
+  - javascript
+  - frontend
+  - ui-library
+  - bootstrap
+
+cards:
+  - id: js-bootstrap-001
+    type: basic
+    front: "O que é o Bootstrap?"
+    back: "É um framework CSS open-source popular que fornece um sistema de grid responsivo (12 colunas), componentes pré-estilizados e classes utilitárias, ideal para prototipagem rápida."
+    tags: [javascript, bootstrap, conceitos]
+
+  - id: js-bootstrap-002
+    type: cloze
+    text: "O sistema de grid do Bootstrap é baseado em {{c1::12}} colunas e utiliza breakpoints como `sm` (≥576px), `md` (≥768px) e `lg` (≥992px)."
+    tags: [javascript, bootstrap, grid]
+
+  - id: js-bootstrap-003
+    type: pitfall
+    trap: "Sobrescrever (override) excessivamente o CSS do Bootstrap."
+    why: "Se você precisa sobrescrever 80% dos estilos originais para atingir o design desejado, o Bootstrap passa a atrapalhar mais do que ajudar."
+    prevention: "Utilize o Bootstrap para painéis administrativos ou protótipos rápidos, ou opte por customizar as variáveis Sass ao invés de forçar overrides no CSS final."
+    tags: [javascript, bootstrap, armadilhas]
+
+  - id: js-bootstrap-004
+    type: vocab
+    term_pt: "Sistema de grid"
+    term_en: "Grid system"
+    definition: "A structure comprising a series of intersecting straight (vertical, horizontal, and angular) or curved lines used to structure content."
+    usage: "Bootstrap's 12-column grid system makes responsive design much easier."
+    tags: [javascript, bootstrap, vocabulario]

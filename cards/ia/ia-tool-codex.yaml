@@ -1,0 +1,41 @@
+source: "IA/Ferramentas de IA/Codex.md"
+source_hash: "6e9629a67a8f"
+deck: "Codex::IA"
+generated: "2026-05-01"
+tags:
+  - ia
+  - llm
+  - codex
+  - openai
+
+cards:
+  - id: ia-codex-001
+    type: basic
+    front: "Como o modelo de execução do OpenAI Codex (2026) se diferencia do Copilot ou Claude Code?"
+    back: "O Codex opera em um sandbox isolado e efêmero na nuvem (cloud-based agent). Ele recebe tarefas, clona o repo, executa tudo assincronamente e retorna um PR completo, em vez de interagir inline ou no CLI local."
+    tags: [ia, llm, codex, arquitetura]
+
+  - id: ia-codex-002
+    type: basic
+    front: "Qual o arquivo crítico que serve como instrução central de contexto para o agente Codex em um repositório?"
+    back: "AGENTS.md. Ele contém detalhes do stack, convenções de código, comandos e antipatterns."
+    tags: [ia, llm, codex, best-practices]
+
+  - id: ia-codex-003
+    type: cloze
+    text: "O principal fluxo de trabalho que o Codex destrava para seniores é o trabalho {{c1::assíncrono}} e o disparo de múltiplas tarefas em {{c2::paralelo}}."
+    tags: [ia, codex, workflow]
+
+  - id: ia-codex-004
+    type: pitfall
+    trap: "Fazer merge de PRs gerados pelo Codex apenas porque todos os testes de CI passaram."
+    why: "Agentes frequentemente cometem erros criativos de semântica que o CI (se não cobrir 100% dos edge cases) ou os linters não capturam, como validações excessivas."
+    prevention: "Sempre faça uma revisão humana rigorosa e semântica de qualquer código antes de integrá-lo, independente de ter passado no CI automatizado."
+    tags: [ia, codex, code-review, pitfall]
+
+  - id: ia-codex-005
+    type: scenario
+    situation: "Você delegou uma tarefa ao Codex para 'Melhorar o módulo de logging'. O PR gerado contém mudanças aleatórias e de estilo, sendo quase impossível de revisar."
+    question: "Por que isso ocorreu e como evitar?"
+    answer: "A tarefa foi muito vaga e sem critério de aceitação claro. Deve-se fornecer tarefas com um escopo detalhado e claro: 'O que fazer, critérios de aceite, o que NÃO fazer'."
+    tags: [ia, codex, prompting, scenario]

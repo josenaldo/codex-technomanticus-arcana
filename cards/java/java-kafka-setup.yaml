@@ -1,0 +1,31 @@
+source: "Java/Backend/Kafka/Setting Up Kafka.md"
+source_hash: "f24a476cdfa1"
+deck: "Codex::Java"
+generated: "2026-04-30"
+tags:
+  - java
+  - kafka
+  - setup
+
+cards:
+  - id: java-setup-001
+    type: basic
+    front: "Qual o comando para iniciar um Kafka Broker usando as configurações padrão?"
+    back: "No terminal (dentro de bin/windows no Windows), utilize o comando: `kafka-server-start.bat ..\\..\\config\\server.properties`"
+    tags: [kafka, setup, broker]
+
+  - id: java-setup-002
+    type: basic
+    front: "Como instanciar um Console Consumer escutando as mensagens desde o início de um tópico?"
+    back: "Use o script de consumer com o parâmetro `--from-beginning`: `kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic <topic-name> --from-beginning`."
+    tags: [kafka, setup, consumer]
+
+  - id: java-setup-003
+    type: cloze
+    text: "Para criar um novo tópico no Kafka via CLI, usa-se o comando `kafka-topics.bat` passando as propriedades {{c1::--create}}, {{c2::--topic}}, `--partitions` e `--replication-factor`."
+    tags: [kafka, setup, topics]
+
+  - id: java-setup-004
+    type: cloze
+    text: "Ao configurar múltiplos Kafka Brokers na mesma máquina, você deve garantir que as propriedades {{c1::broker.id}}, {{c2::listeners}} e {{c3::log.dirs}} sejam únicas em cada `server.properties`."
+    tags: [kafka, setup, broker]

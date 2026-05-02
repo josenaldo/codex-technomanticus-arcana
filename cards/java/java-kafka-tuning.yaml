@@ -1,0 +1,39 @@
+source: "Java/Backend/Kafka/Otimizando Kafka consumers.md"
+source_hash: "7e1a67390c18"
+deck: "Codex::Java"
+generated: "2026-04-30"
+tags:
+  - java
+  - kafka
+  - tuning
+
+cards:
+  - id: java-tuning-001
+    type: basic
+    front: "Como melhorar o throughput do Kafka Consumer aumentando o tamanho do batch?"
+    back: "Aumentando os parâmetros `fetch.min.bytes` (quantidade mínima de dados) e `fetch.max.wait.ms` (tempo de espera máximo). Isso reduz requisições ao broker e traz mais dados por batch, melhorando o throughput."
+    tags: [kafka, tuning, throughput]
+
+  - id: java-tuning-002
+    type: basic
+    front: "Como evitar perda ou duplicidade de dados relacionada ao auto-commit no Kafka?"
+    back: "Desativar `enable.auto.commit` (colocando como false) e realizar o commit manual (via `commitSync` ou `commitAsync`) após processar o lote de mensagens com sucesso."
+    tags: [kafka, tuning, commit]
+
+  - id: java-tuning-003
+    type: basic
+    front: "Qual a diferença entre commitSync e commitAsync no Kafka Consumer?"
+    back: "O `commitSync` espera a resposta do broker (menor risco de duplicidade, maior latência). O `commitAsync` não espera resposta (melhor throughput e latência, porém maior risco de duplicar dados em rebalances)."
+    tags: [kafka, tuning, commit]
+
+  - id: java-tuning-004
+    type: cloze
+    text: "Para evitar rebalances constantes por lentidão, aumente o {{c1::max.poll.interval.ms}}, que é o limite de tempo para o consumer processar as mensagens do último poll."
+    tags: [kafka, tuning, rebalance]
+
+  - id: java-tuning-005
+    type: pitfall
+    trap: "Reduzir muito o parâmetro max.poll.records"
+    why: "Isso faz o consumer processar muito rápido e ter que chamar o poll inúmeras vezes, adicionando carga de CPU excessiva no consumer e no broker."
+    prevention: "Mantenha um equilíbrio ajustando `max.poll.records` com a capacidade de processamento sem gerar chamadas demasiadas."
+    tags: [kafka, tuning, armadilhas]

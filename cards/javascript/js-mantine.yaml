@@ -1,0 +1,34 @@
+source: "JavaScript/Frontend/Mantine.md"
+source_hash: "56a10ac68cfc"
+deck: "Codex::JavaScript"
+generated: "2026-04-30"
+tags:
+  - javascript
+  - frontend
+  - ui-library
+  - mantine
+
+cards:
+  - id: js-mantine-001
+    type: basic
+    front: "O que é Mantine?"
+    back: "É uma biblioteca de componentes React moderna que oferece um design neutro e flexível, utilizando CSS Modules nativamente (v7+) e provendo uma extensa coleção de hooks utilitários."
+    tags: [javascript, mantine, conceitos]
+
+  - id: js-mantine-002
+    type: basic
+    front: "Como o Mantine se diferencia do Material UI em termos de design e estilos?"
+    back: "O Mantine possui um design visual mais neutro (não amarrado ao Material Design) e usa CSS Modules na v7, enquanto o MUI é estritamente opinado pelo Material Design e usa CSS-in-JS (Emotion)."
+    tags: [javascript, mantine, comparacao]
+
+  - id: js-mantine-003
+    type: cloze
+    text: "O Mantine possui pacotes adicionais muito úteis, como o {{c1::@mantine/hooks}} (com utilitários como `useDisclosure`) e o {{c2::@mantine/form}} para gerenciamento de formulários."
+    tags: [javascript, mantine, ecossistema]
+
+  - id: js-mantine-004
+    type: pitfall
+    trap: "Ignorar as quebras de compatibilidade (breaking changes) ao migrar entre major versions."
+    why: "A migração da versão 6 para a 7 do Mantine teve mudanças significativas, como a troca da engine de estilização de CSS-in-JS para CSS Modules, exigindo refatoração profunda nos componentes customizados."
+    prevention: "Leia o guia de migração cuidadosamente e atualize gradualmente os estilos para CSS Modules antes de aplicar a mudança principal de versão."
+    tags: [javascript, mantine, armadilhas]

@@ -1,0 +1,32 @@
+source: "Infraestrutura/Terminal.md"
+source_hash: "bd74fcad2bd6"
+deck: "Codex::Infraestrutura"
+generated: "2026-05-01"
+tags:
+  - infraestrutura
+  - terminal
+  - zsh
+
+cards:
+  - id: infra-terminal-001
+    type: basic
+    front: "O que difere o 'globbing' do Zsh em relação ao do Bash?"
+    back: "O Zsh possui extended globbing nativo, o que permite fazer matchings recursivos complexos de forma mais simples (ex: `**/*.ts`), enquanto no Bash isso exige flags adicionais (`shopt -s globstar`)."
+    tags: [zsh, bash, cli]
+
+  - id: infra-terminal-002
+    type: cloze
+    text: "O plugin {{c1::zsh-autosuggestions}} acelera a digitação sugerindo comandos baseados no seu histórico recente (aceitando com a seta para a direita)."
+    tags: [zsh, produtividade, plugin]
+
+  - id: infra-terminal-003
+    type: cloze
+    text: "No contexto do plugin git do Oh My Zsh, o atalho `gst` expande para {{c1::git status}}, enquanto `gco` expande para {{c2::git checkout}}."
+    tags: [zsh, git, alias]
+
+  - id: infra-terminal-004
+    type: pitfall
+    trap: "Instalar Zsh e plugins, mas esquecer de defini-lo como o shell padrão do sistema operacional."
+    why: "Ao abrir o terminal, você ainda cairá no Bash e não verá as configurações."
+    prevention: "Execute `chsh -s $(which zsh)` e faça logout/login para aplicar a alteração globalmente ao seu usuário."
+    tags: [zsh, terminal, pitfall]

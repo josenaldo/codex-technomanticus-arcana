@@ -1,0 +1,53 @@
+source: "IA/Ferramentas de IA/Claude.md"
+source_hash: "3466658db143"
+deck: "Codex::IA"
+generated: "2026-05-01"
+tags:
+  - ia
+  - llm
+  - claude
+
+cards:
+  - id: ia-claude-001
+    type: basic
+    front: "Quais são os três níveis principais de modelos na família Claude 4.x e seus casos de uso ideais?"
+    back: "1) Opus: Raciocínio profundo, tarefas complexas. 2) Sonnet: Equilíbrio (default para 90% dos casos, coding diário). 3) Haiku: Otimização de custo/latência para tarefas de alto volume e extração."
+    tags: [ia, llm, claude, modelos]
+
+  - id: ia-claude-002
+    type: basic
+    front: "O que é 'Constitutional AI' no contexto do Claude e qual sua principal vantagem prática?"
+    back: "É uma técnica de alinhamento onde um modelo auto-avalia suas respostas com base em um conjunto de princípios escritos. Vantagem: Menos bajulação, mais consistência em admitir não saber, e explicações claras para recusas."
+    tags: [ia, llm, claude, constitutional-ai]
+
+  - id: ia-claude-003
+    type: cloze
+    text: "No desenvolvimento com a API da Anthropic, o {{c1::prompt caching}} em system prompts grandes pode gerar uma economia típica de custo e latência de {{c2::50-90%}}."
+    tags: [ia, claude, api, performance]
+
+  - id: ia-claude-004
+    type: cloze
+    text: "O {{c1::Claude Code}} é o CLI agent oficial da Anthropic, e a alavanca principal para extrair valor dele em um projeto é manter um arquivo {{c2::CLAUDE.md}} bem estruturado na raiz."
+    tags: [ia, claude, claude-code]
+
+  - id: ia-claude-005
+    type: vocab
+    term_pt: "Raciocínio Estendido (Extended Thinking)"
+    term_en: "Extended Thinking"
+    definition: "Modo em que o Claude 4.x gera blocos de tokens de 'pensamento' antes de retornar a resposta final, tornando seu processo de raciocínio transparente e auditável."
+    usage: "O Extended Thinking é ótimo para código longo ou lógica matemática, mas aumenta os custos pois os tokens de pensamento são cobrados."
+    tags: [ia, claude, prompt-engineering, vocab]
+
+  - id: ia-claude-006
+    type: pitfall
+    trap: "Usar o alias de versão (ex: 'claude-sonnet-4-6') em código de produção."
+    why: "O provider pode atualizar o modelo por trás do alias silenciosamente, causando regressões inesperadas no comportamento ou formato do output da sua feature."
+    prevention: "Sempre faça pin da versão específica (ex: 'claude-sonnet-4-6-20260315') em produção e use um golden set antes de migrar."
+    tags: [ia, claude, api, pitfall]
+
+  - id: ia-claude-007
+    type: scenario
+    situation: "Você precisa extrair dados estruturados (JSON) consistentes de milhares de tickets de suporte."
+    question: "Como você força o Claude a retornar JSON validado já que ele não tem um 'JSON mode' explícito?"
+    answer: "Utilize tool use forçado (forçando `tool_choice` com o nome da tool). O input da tool obedecerá ao JSON Schema definido."
+    tags: [ia, claude, api, tool-use]

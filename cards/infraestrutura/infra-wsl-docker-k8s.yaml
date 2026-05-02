@@ -1,0 +1,24 @@
+source: "Infraestrutura/WSL, Docker e Kubernetes.md"
+source_hash: "63fe43fff939"
+deck: "Codex::Infraestrutura"
+generated: "2026-05-01"
+tags:
+  - docker
+  - kubernetes
+  - wsl
+
+cards:
+  - id: infra-kubernetes-001
+    type: scenario
+    situation: "No Docker Compose, o serviço do 'keycloak' está falhando ao iniciar porque o 'db' (banco de dados) demora para inicializar, mesmo usando `depends_on: db`."
+    question: "Como resolver isso?"
+    answer: "Adicione um bloco `healthcheck` no serviço do DB, e mude o `depends_on` do Keycloak para exigir que a condição do banco seja `condition: service_healthy` em vez do padrão `service_started`."
+    tags: [docker-compose, docker, dependencias]
+
+  - id: infra-kubernetes-002
+    type: vocab
+    term_pt: "Lazy Docker"
+    term_en: "Lazy Docker"
+    definition: "Uma interface gráfica interativa via terminal (TUI) desenvolvida em Go, usada para gerenciar containers, imagens e volumes do Docker facilmente via teclado."
+    usage: "Substitui dezenas de comandos de linha para checar logs e parar/restartar serviços."
+    tags: [docker, tui, gui, vocab]

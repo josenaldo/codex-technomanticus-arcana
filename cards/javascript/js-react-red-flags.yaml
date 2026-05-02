@@ -1,0 +1,63 @@
+source: "JavaScript/Frontend/React Red Flag Manual.md"
+source_hash: "d1f50233879d"
+deck: "Codex::JavaScript"
+generated: "2026-04-30"
+tags:
+  - javascript
+  - frontend
+  - react
+  - red-flags
+  - anti-patterns
+
+cards:
+  - id: js-redflags-001
+    type: basic
+    front: "Por que evitar o Lodash (como cloneDeep, groupBy) em bases de código React modernas?"
+    back: "Porque muitas funções ganharam equivalentes nativos no JavaScript mais leves e rápidos, como `structuredClone()` para cópia profunda e `Object.groupBy()`. Isso reduz o tamanho do bundle e diminui riscos de segurança."
+    tags: [javascript, react, dependencias]
+
+  - id: js-redflags-002
+    type: basic
+    front: "Quais são as desvantagens dos 'Barrel Files' (index.ts que faz export *)?"
+    back: "Eles podem quebrar o tree-shaking em bundlers antigos, deixar o hot-reload mais lento, causar ciclos invisíveis de importação (circular dependencies) e dificultar navegação na IDE."
+    tags: [javascript, react, arquitetura]
+
+  - id: js-redflags-003
+    type: cloze
+    text: "Um anti-padrão de organização comum é o arquivo {{c1::utils.ts}} atuando como uma gaveta de tranqueiras. A solução é particionar esses utilitários por {{c2::domínio}} (ex: `date.ts`, `string.ts`)."
+    tags: [javascript, react, organizacao]
+
+  - id: js-redflags-004
+    type: basic
+    front: "O que é 'Colocalização' (Colocation) no React?"
+    back: "É o princípio de organizar a arquitetura agrupando arquivos que mudam juntos. Exemplo: colocar o componente, seu teste, seu hook e seu CSS (ex: UserCard.tsx, UserCard.test.tsx) na mesma pasta, em vez de separados por tipo."
+    tags: [javascript, react, arquitetura]
+
+  - id: js-redflags-005
+    type: pitfall
+    trap: "Definir um componente dentro de outro componente React."
+    why: "Isso faz com que o React identifique o componente interno como uma nova função a cada render do pai. Consequência: o estado interno é zerado, inputs perdem o foco e a performance degrada com montagem e desmontagem desnecessárias."
+    prevention: "Defina os componentes sempre no escopo raiz (fora de outras funções). Se o filho precisar de dados do pai, passe via props."
+    tags: [javascript, react, armadilhas, render]
+
+  - id: js-redflags-006
+    type: pitfall
+    trap: "Sincronizar valores derivados guardando-os no estado local (ex: firstName e lastName gerando um fullName no state)."
+    why: "Isso cria múltiplas fontes de verdade. Ao esquecer de sincronizar via `useEffect`, os dados podem ficar defasados, e o uso de efeitos cria re-renderizações em cascata."
+    prevention: "Calcule os valores derivados durante a fase de renderização. Se o cálculo for muito custoso, utilize `useMemo`, mas evite `useState` para esse propósito."
+    tags: [javascript, react, armadilhas, state]
+
+  - id: js-redflags-007
+    type: pitfall
+    trap: "Usar state para guardar valores como IDs de timers (setTimeout), referências a DOM ou variáveis mutáveis que não refletem na tela."
+    why: "Toda alteração de state dispara um re-render do componente, o que é um desperdício de recursos para valores dos quais a UI não depende diretamente."
+    prevention: "Utilize o hook `useRef` para armazenar instâncias mutáveis (como `AbortController` ou IDs de intervalo) que precisam persistir entre renders sem acionar atualizações visuais."
+    tags: [javascript, react, armadilhas, state, refs]
+
+  - id: js-redflags-008
+    type: vocab
+    term_pt: "God component (Componente Deus)"
+    term_en: "God component"
+    definition: "An anti-pattern where a single component takes on too many responsibilities (fetching, state management, UI rendering of complex views), making it hard to test, maintain, and refactor."
+    usage: "We need to break down this God component by extracting the business logic into custom hooks and the UI parts into smaller components."
+    tags: [javascript, react, vocabulario]

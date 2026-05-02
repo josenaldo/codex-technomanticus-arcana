@@ -1,0 +1,40 @@
+source: "Infraestrutura/Configurando Ambiente Linux no WSL.md"
+source_hash: "7f4b0258b64c"
+deck: "Codex::Infraestrutura"
+generated: "2026-05-01"
+tags:
+  - wsl
+  - linux
+  - terminal
+  - zsh
+
+cards:
+  - id: infra-linux-001
+    type: basic
+    front: "Para garantir que ícones e glifos especiais renderizem corretamente no Windows Terminal (ex: Powerlevel10k), qual tipo de fonte deve ser instalada?"
+    back: "Fontes do tipo Nerd Fonts, como a Fira Code Nerd Font."
+    tags: [terminal, wsl, fontes]
+
+  - id: infra-linux-002
+    type: basic
+    front: "O que deve ser feito se a internet do Linux dentro do WSL estiver muito lenta (downloads e pacotes)?"
+    back: "Nas propriedades do adaptador de rede `vEthernet (WSL)` no Painel de Controle do Windows, desabilitar 'Large Send Offload Version 2 (IPv4)' e (IPv6)."
+    tags: [wsl, rede, troubleshooting]
+
+  - id: infra-linux-003
+    type: cloze
+    text: "Para adicionar um tema customizado no Windows Terminal, você edita o arquivo {{c1::settings.json}} e adiciona o código JSON do esquema na lista de {{c2::schemes}}."
+    tags: [terminal, wsl, windows]
+
+  - id: infra-linux-004
+    type: cloze
+    text: "Ao invés de baixar pacotes e instalar linguagens via apt no WSL para JS, usa-se o {{c1::NVM}} para Node, e para o Go atualiza-se o path com o binário em {{c2::/usr/local/go/bin}}."
+    tags: [wsl, setup, linguagens]
+
+  - id: infra-linux-005
+    type: vocab
+    term_pt: "Oh My Zsh"
+    term_en: "Oh My Zsh"
+    definition: "Um framework voltado para gerenciar a configuração do Zsh, oferecendo centenas de plugins úteis e temas prontos."
+    usage: "Usado frequentemente para habilitar plugins como git, zsh-autosuggestions e syntax highlighting."
+    tags: [zsh, terminal, wsl, vocab]

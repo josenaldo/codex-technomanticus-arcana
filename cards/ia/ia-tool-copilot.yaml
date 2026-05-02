@@ -1,0 +1,38 @@
+source: "IA/Ferramentas de IA/GitHub Copilot.md"
+source_hash: "340ff5f92a0d"
+deck: "Codex::IA"
+generated: "2026-05-01"
+tags:
+  - ia
+  - copilot
+  - github
+
+cards:
+  - id: ia-copilot-001
+    type: basic
+    front: "O que é o arquivo `.github/copilot-instructions.md` e qual sua função principal?"
+    back: "É um arquivo de texto onde se definem instruções como arquitetura, stack e convenções. Ele atua como contexto global injetado automaticamente nas sessões do Copilot Chat e Copilot Agent."
+    tags: [ia, copilot, setup, contexto]
+
+  - id: ia-copilot-002
+    type: basic
+    front: "Por que e como você não deve invocar o Copilot Chat sem âncoras de contexto ('como eu faço isso?')?"
+    back: "Sem referências concretas de arquivo, as respostas são muito genéricas, ignorando os padrões locais. Sempre use hashtags como `#file:nome`, `#folder:dir` ou `#problem` para passar contexto exato."
+    tags: [ia, copilot, workflow, chat]
+
+  - id: ia-copilot-003
+    type: cloze
+    text: "O {{c1::Public code filter}} do Copilot deve sempre ser mantido LIGADO em projetos comerciais para reduzir o risco jurídico de copiar acidentalmente trechos de código com licenças restritivas (GPL)."
+    tags: [ia, copilot, seguranca, licensa]
+
+  - id: ia-copilot-004
+    type: cloze
+    text: "Para garantir que o Copilot NUNCA leia variáveis de ambiente críticas ou chaves durante a predição/chat, devemos listar as rotas desses arquivos sigilosos no arquivo de filtro chamado {{c1::.copilotignore}}."
+    tags: [ia, copilot, seguranca]
+
+  - id: ia-copilot-005
+    type: pitfall
+    trap: "Aceitar Completions sem ler (usando TAB cego)."
+    why: "O modelo frequentemente alucina ou comete pequenos erros criativos que parecem sintaticamente corretos em relance, mas semanticamente errados, introduzindo side-effects em produção."
+    prevention: "Leia as sugestões linha a linha e invista em testes automatizados rigorosos para capturar regressões lógicas."
+    tags: [ia, copilot, code-review, pitfall]

@@ -1,0 +1,41 @@
+source: "IA/Ferramentas de IA/Comparativo de LLMs.md"
+source_hash: "e4e235fc4693"
+deck: "Codex::IA"
+generated: "2026-05-01"
+tags:
+  - ia
+  - llm
+  - comparativo
+
+cards:
+  - id: ia-comp-001
+    type: basic
+    front: "Quais são as três famílias dominantes de LLMs em 2026 e em quais áreas cada uma se destaca?"
+    back: "1) Claude (Anthropic): Forte em código, tool use consistente e safety. 2) GPT (OpenAI): Multimodal (voz), ampla integração enterprise. 3) Gemini (Google): Multimodal nativo e contexto gigante (2M)."
+    tags: [ia, llm, comparativo, modelos]
+
+  - id: ia-comp-002
+    type: basic
+    front: "O que é a estratégia de 'Tiering Agressivo' em arquitetura de IA?"
+    back: "Usar modelos mais baratos e rápidos (como Haiku/Flash-Lite) para tarefas simples de triagem e escalar para modelos pesados (Sonnet/GPT-4/Opus) apenas quando a complexidade exigir. Reduz muito os custos (5 a 10x)."
+    tags: [ia, llm, arquitetura, custo]
+
+  - id: ia-comp-003
+    type: cloze
+    text: "O problema de usar {{c1::LLM-as-a-judge}} é que o LLM avaliador frequentemente tem vieses, como o {{c2::length bias}} (preferir respostas longas) e {{c3::position bias}}."
+    tags: [ia, llm, avaliação]
+
+  - id: ia-comp-004
+    type: vocab
+    term_pt: "Conjunto Dourado (Golden Set)"
+    term_en: "Golden Set"
+    definition: "Um conjunto de dados estático e curado de inputs representativos de uma feature e os outputs esperados, usado para testar e auditar novos modelos/prompts antes de ir para produção."
+    usage: "Nunca decida a troca de um LLM com base em benchmarks públicos como MMLU; rode a nova versão contra o seu Golden Set primeiro."
+    tags: [ia, llm, testes, vocab]
+
+  - id: ia-comp-005
+    type: pitfall
+    trap: "Decidir o modelo a usar exclusivamente com base em preço ou benchmarks públicos populares (HumanEval, MMLU)."
+    why: "Benchmarks não refletem o workload real. Além disso, 'custo por token' é ilusório: se um modelo barato erra muito, o 'custo por resposta certa' aumenta e exige retrabalho."
+    prevention: "Teste com golden set próprio, medindo precisão na tarefa, tempo de resposta e o Custo Total de Propriedade (TCO)."
+    tags: [ia, llm, pitfall, benchmarks]

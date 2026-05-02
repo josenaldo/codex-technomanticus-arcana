@@ -1,0 +1,38 @@
+source: "Infraestrutura/Comandos Docker e WSL.md"
+source_hash: "4512ff5bc257"
+deck: "Codex::Infraestrutura"
+generated: "2026-05-01"
+tags:
+  - docker
+  - wsl
+  - comandos
+
+cards:
+  - id: infra-docker-001
+    type: basic
+    front: "Qual a diferença de comportamento entre rodar um container com a opção `-v` (volume) ou com `--mount type=bind` quando o diretório do host não existe?"
+    back: "A opção `-v` cria automaticamente os diretórios inexistentes no host. A opção `--mount` é mais estrita e lança um erro se o diretório do host não existir."
+    tags: [docker, volume, mount]
+
+  - id: infra-docker-002
+    type: basic
+    front: "O que o comando `docker run -d -p 9090:80 nginx` faz?"
+    back: "Ele cria e inicia um container da imagem nginx em segundo plano (`-d` detached), mapeando a porta 9090 do host para a porta 80 do container."
+    tags: [docker, run, portas]
+
+  - id: infra-docker-003
+    type: cloze
+    text: "O comando {{c1::docker exec -it <container> bash}} é usado para iniciar um shell interativo dentro de um container que já está em execução."
+    tags: [docker, bash, cli]
+
+  - id: infra-docker-004
+    type: cloze
+    text: "No WSL, o comando {{c1::wsl --export}} é utilizado para empacotar uma distribuição Linux instalada em um arquivo tar para backup."
+    tags: [wsl, backup, export]
+
+  - id: infra-docker-005
+    type: pitfall
+    trap: "Usar `docker rm` em um container que ainda está em execução."
+    why: "O Docker não permite a remoção de contêineres em execução para evitar perda acidental de dados."
+    prevention: "Pare o container primeiro com `docker stop` ou force a remoção passando a flag `-f`."
+    tags: [docker, cli, pitfall]

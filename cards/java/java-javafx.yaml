@@ -1,0 +1,46 @@
+source: "Java/Frontend/JavaFX.md"
+source_hash: "50bd512c1aef"
+deck: "Codex::Java"
+generated: "2026-04-30"
+tags:
+  - java
+  - frontend
+  - entrevista
+
+cards:
+  - id: java-javafx-001
+    type: basic
+    front: "O que é JavaFX?"
+    back: "É o framework oficial da Oracle para construção de aplicações desktop Java com interfaces gráficas ricas, substituindo o antigo Swing. Utiliza XML declarativo (FXML) para layouts e CSS para estilo."
+    tags: [java, javafx, frontend]
+
+  - id: java-javafx-002
+    type: basic
+    front: "Qual a estrutura de arquitetura (hierarquia) de uma interface no JavaFX?"
+    back: "Stage (janela da aplicação) -> Scene (container visual da janela) -> Scene Graph (árvore de nós que compõem a UI, como layouts e controles)."
+    tags: [java, javafx, arquitetura]
+
+  - id: java-javafx-003
+    type: cloze
+    text: "No JavaFX, o {{c1::FXML}} define o layout de forma declarativa (separando a UI), e a lógica fica no {{c2::Controller}}, conectado pela propriedade `fx:controller`."
+    tags: [java, javafx, fxml]
+
+  - id: java-javafx-004
+    type: cloze
+    text: "O JavaFX usa propriedades observáveis (como {{c1::StringProperty}}) para realizar {{c2::data binding}} reativo com os elementos visuais."
+    tags: [java, javafx, binding]
+
+  - id: java-javafx-005
+    type: pitfall
+    trap: "Bloquear a Application Thread (UI thread)"
+    why: "Ao rodar operações demoradas (como I/O de banco ou rede) na thread principal, a interface gráfica congela e fica não-responsiva para o usuário."
+    prevention: "Execute tarefas pesadas em `Task<V>` ou `Service<V>` em threads secundárias, e faça atualizações na UI via `Platform.runLater()`."
+    tags: [java, javafx, armadilhas]
+
+  - id: java-javafx-006
+    type: vocab
+    term_pt: "Vinculação de dados"
+    term_en: "Data binding"
+    definition: "The process of tying data variables to UI elements so that when the data changes, the UI automatically updates, and vice-versa."
+    usage: "We use data binding to sync the text field with the model's property."
+    tags: [java, javafx, vocabulario]

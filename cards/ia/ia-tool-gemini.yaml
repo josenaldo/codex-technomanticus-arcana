@@ -1,0 +1,39 @@
+source: "IA/Ferramentas de IA/Gemini.md"
+source_hash: "8f679979232b"
+deck: "Codex::IA"
+generated: "2026-05-01"
+tags:
+  - ia
+  - llm
+  - gemini
+  - google
+
+cards:
+  - id: ia-gemini-001
+    type: basic
+    front: "O que significa dizer que a família Gemini é 'multimodal nativa' em comparação ao GPT-4 clássico?"
+    back: "Gemini não é um modelo de texto ao qual adicionaram um codificador visual à força. Ele foi treinado desde o início processando de maneira unificada imagem, vídeo, áudio e texto no mesmo espaço vetorial/tokens."
+    tags: [ia, gemini, multimodal]
+
+  - id: ia-gemini-002
+    type: basic
+    front: "Qual é a principal utilidade e o principal desafio do contexto de 2M de tokens do Gemini Pro?"
+    back: "Útil para cruzar dados de vídeos inteiros, codebases e dezenas de documentos pesados numa chamada só. Desafio: 'Lost-in-the-middle', context rot e latência; frequentemente RAG ainda é superior para recuperação de precisão."
+    tags: [ia, gemini, contexto]
+
+  - id: ia-gemini-003
+    type: cloze
+    text: "O {{c1::Grounding}} no Gemini permite que ele faça pesquisas na Web (Google Search) em tempo real para responder com base em dados mais recentes, eliminando parte das alucinações de fatos atuais."
+    tags: [ia, gemini, grounding]
+
+  - id: ia-gemini-004
+    type: cloze
+    text: "No desenvolvimento Enterprise/Gov, times preferem o Vertex AI ao invés da API direta do Gemini por causa de recursos críticos como {{c1::Data Residency}} (Residência de dados) e integração profunda de {{c2::IAM}} (Permissões)."
+    tags: [ia, gemini, gcp, vertex]
+
+  - id: ia-gemini-005
+    type: pitfall
+    trap: "Confiar cegamente nas respostas via Grounding (Google Search) sem validação do usuário."
+    why: "O Grounding puxa dados recentes indexados pelo buscador. Se um blog ou fonte errada/SEO otimizada ranquear bem, a IA vai usar essas informações incorretas."
+    prevention: "Filtre fontes aceitáveis (se houver como) e aplique Human-in-the-Loop na validação para cenários de missão crítica."
+    tags: [ia, gemini, pitfall, grounding]

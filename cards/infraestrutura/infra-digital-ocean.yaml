@@ -1,0 +1,28 @@
+source: "Infraestrutura/Digital Ocean.md"
+source_hash: "b3dcc02c9a24"
+deck: "Codex::Infraestrutura"
+generated: "2026-05-01"
+tags:
+  - infraestrutura
+  - digitalocean
+  - nginx
+
+cards:
+  - id: infra-ocean-001
+    type: basic
+    front: "Qual é a ferramenta principal sugerida para configurar HTTPS/TLS gratuito em um servidor Nginx na DigitalOcean?"
+    back: "Let's Encrypt, que funciona como uma Autoridade Certificadora (CA) para gerar certificados gratuitos e automáticos."
+    tags: [nginx, ssl, digitalocean]
+
+  - id: infra-ocean-002
+    type: cloze
+    text: "A ferramenta padrão no Ubuntu (e frequentemente recomendada em tutoriais da DigitalOcean) para configuração e simplificação do firewall é o {{c1::UFW}} (Uncomplicated Firewall)."
+    tags: [firewall, ubuntu, seguranca]
+
+  - id: infra-ocean-003
+    type: vocab
+    term_pt: "API Gateway"
+    term_en: "API Gateway"
+    definition: "Um servidor que atua como ponto de entrada único (front-end) para receber requisições de clientes, repassando-as para os microserviços adequados (ou monólitos) no backend."
+    usage: "A DigitalOcean documentou a criação de um API Gateway para ajudar na transição gradual do monólito para dezenas de microserviços."
+    tags: [arquitetura, microservicos, gateway, vocab]
